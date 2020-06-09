@@ -22,10 +22,10 @@ pip install -r requirements.txt
 To train the model(s) in the paper, run this command:
 
 ```train
-python -m get_gradient_weight.main --model='resnet14' --epochs=500  --batch_size=1024
-python -m get_gradient_weight.main --model='resnet20' --epochs=500  --batch_size=1024
-python -m get_gradient_weight.main --model='resnet14_noshort' --epochs=500  --batch_size=1024
-python -m get_gradient_weight.main --model='resnet20_noshort' --epochs=500  --batch_size=1024
+python -m main --model='resnet14' --epochs=500  --batch_size=1024
+python -m main --model='resnet20' --epochs=500  --batch_size=1024
+python -m main --model='resnet14_noshort' --epochs=500  --batch_size=1024
+python -m main --model='resnet20_noshort' --epochs=500  --batch_size=1024
 ```
 
 All available models are in folder /train_DNN_code/
