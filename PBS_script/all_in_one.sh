@@ -22,7 +22,7 @@ python hessian.compute_hessian_eig_GZ.py --cuda --batch_size=128 --model=${param
 
 # MATLAB post analysis
 MATLAB_SOURCE_PATH="/path/to/post_analysis"
-MATLAB_PROCESS_FUNC="SGD_analysis"
+MATLAB_PROCESS_FUNC="SGD_analysis_step_level"
 
 matlab  -nodisplay  -r "cd('${MATLAB_SOURCE_PATH1}'), addpath(genpath(cd)), cd('${PBS_O_WORKDIR}') , \
                                                    cd('${MATLAB_SOURCE_PATH2}'), addpath(genpath(cd)), cd('${PBS_O_WORKDIR}'), \
