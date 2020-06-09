@@ -1,11 +1,9 @@
-% plot figures of Proj3
 clear
 close all
 %% load data
-d = dir('/import/headnode1/gche4213/Project3/*net*');
+d = dir('*net*');
 ii = 2;
 datax_dir = dir(fullfile(d(ii).folder,d(ii).name,'*data_part*'));
-Lecun = load(fullfile(datax_dir(1).folder,'MSD_lecun.mat'));
 loss_all = [];
 for part = 1:length(datax_dir)-1
     try
@@ -62,12 +60,11 @@ linewidth = 0.7;
 ylabel_shift = -0.25;
 xlabel_shift = -0.2;
 TickLength = 0.03;
-% [ verti_length, verti_dis, hori_dis ] = get_details_for_subaxis( total_row, total_column, hori_length, edge_multiplyer_h, inter_multiplyer_h, edge_multiplyer_v, inter_multiplyer_v )
 EMH = 0.1;
 EMV = 0.5;
 MLR = 1;
 MBR = 1;
-[ figure_hight, SV, SH, MT, MB, ML, MR ] = get_details_for_subaxis(total_row, total_column, figure_width, EMH, 0.4, EMV, 0.3, MLR, MBR );
+[figure_hight, SV, SH, MT, MB, ML, MR ] = get_details_for_subaxis(total_row, total_column, figure_width, EMH, 0.4, EMV, 0.3, MLR, MBR );
 
 figure('NumberTitle','off','name', 'trapping', 'units', 'centimeters', ...
     'color','w', 'position', [0, 0, figure_width, figure_hight], ...
@@ -121,16 +118,6 @@ legend boxoff
 text(-0.2,1.15,'c','fontsize',fontsize,'Units', 'Normalized', 'FontWeight','bold','VerticalAlignment', 'Top')
 set(gca,'linewidth',linewidth,'fontsize',fontsize,'tickdir','out','xscale','log','yscale','log','xtick',[0.1,1,10,100],'TickLength',[TickLength 0.035])
 
-
-% % colorbar
-% originalSize = get(gca, 'Position');
-% caxis([1,1 + (select_num-1)*1e3])
-% colormap(cc,'jet')
-% c = colorbar('Position', [originalSize(1) + originalSize(3) + 0.02  originalSize(2)  0.015 originalSize(4)],'location','east');
-% T = title(c,'t_w (step)','fontsize',fontsize);
-% % set(T,'Units', 'Normalized', 'Position', [0,0.5, 5]);
-% set(gca, 'Position', originalSize);
-
 % a single contour length vs MSD curve
 insect = axes('position',[0.817460317460317 0.558596971434323 0.0806878306878308 0.333155605885265]);
 axis(insect)
@@ -141,16 +128,12 @@ plot(contour_length{k},smoothdata(MSD_forcontour{k},'movmean',[40,400]),'r:','li
 axis([0.08 200 8e-3 100])
 legend({'Raw','Smo.'},'location','northwest')
 legend boxoff
-% x = xlabel('Contour length');
-% set(x, 'Units', 'Normalized', 'Position', [0.5, -0.1, 0]);
-% y = ylabel('{\Delta}r^2');
-% set(y, 'Units', 'Normalized', 'Position', [-0.22, 0.5, 0]);
 set(gca,'xscale','log','yscale','log','xtick',[],'ytick',[])
 
 set(gcf, 'PaperPositionMode', 'auto');
 
 % output
-print('-painters' ,'/import/headnode1/gche4213/Project3/outputfigures/fractal_landscape_path1.svg','-dsvg','-r300')
+print('-painters' ,'fractal_landscape_path.svg','-dsvg','-r300')
 function [distance_coarse,MSL_coarse] = coarse_grain(distance,MSL,coarse_num)
 % coarse grain for visualization
 Dis_coarse = linspace(min(distance),max(distance),coarse_num+1);

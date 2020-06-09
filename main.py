@@ -109,27 +109,9 @@ def train_save(trainloader, net, criterion, optimizer, use_cuda=True):
             correct += predicted.cpu().eq(targets).cpu().sum().item()
 
     M = len(grads[0]) # total number of parameters
-    grads = torch.cat(grads).view(-1, M)
-    mean_grad = grads.sum(0) / (batch_idx + 1) # divided by # batchs
-    noise_norm = (grads - mean_grad).norm(dim=1)
-    
-    N = M * (batch_idx + 1) 
+    grads = torch.cat(grads).view(-1, M)  
 
-    for i in range(1, 1 + int(math.sqrt(N))):
-        if N%i == 0:
-            m = i
-    alpha = alpha_estimator(m, (grads - mean_grad).view(-1, 1))
-    
-    del grads
-    del mean_grad
-
-    hist_noise = [noise_norm.numpy(), alpha.numpy()]
-
-    w,g = get_layerWise_norms(net)
-
-    layerWise_norms = [w,g]  
-
-    return train_loss/total, 100 - 100.*correct/total, hist_noise, layerWise_norms, sub_weights, sub_loss
+    return train_loss/total, 100 - 100.*correct/total, sub_weights, sub_loss, grads
 
 
 def test_save(testloader, net, criterion, use_cuda=True):
@@ -231,26 +213,8 @@ def train(trainloader, net, criterion, optimizer, use_cuda=True):
 
     M = len(grads[0]) # total number of parameters
     grads = torch.cat(grads).view(-1, M)
-    mean_grad = grads.sum(0) / (batch_idx + 1) # divided by # batchs
-    noise_norm = (grads - mean_grad).norm(dim=1)
-    
-    N = M * (batch_idx + 1) 
-
-    for i in range(1, 1 + int(math.sqrt(N))):
-        if N%i == 0:
-            m = i
-    alpha = alpha_estimator(m, (grads - mean_grad).view(-1, 1))
-    
-    del grads
-    del mean_grad
-
-    hist_noise = [noise_norm.numpy(), alpha.numpy()]
-
-    w,g = get_layerWise_norms(net)
-
-    layerWise_norms = [w,g]  
-
-    return train_loss/total, 100 - 100.*correct/total, hist_noise, layerWise_norms
+  
+    return train_loss/total, 100 - 100.*correct/total, grads
 
 
 def test(testloader, net, criterion, use_cuda=True):
@@ -437,16 +401,14 @@ if __name__ == '__main__':
     # training logs per iteration
     training_history = []
     testing_history = []
-    weight_grad_history = []
-    # noise logs less frequently
-    noise_norm_history_TRAIN = []
+    # gradient container
+    grads_history = []
 
     for epoch in range(start_epoch, args.epochs + 1):
         print(epoch)        
-
         # Save checkpoint.
         if epoch == 1 or epoch % args.save_epoch == 0 or epoch == 150:
-            loss, train_err, hist_noise, layerWise_norms, sub_weights, sub_loss = train_save(trainloader, net, criterion, optimizer, use_cuda)
+            loss, train_err, sub_weights, sub_loss, grads = train_save(trainloader, net, criterion, optimizer, use_cuda)
             test_loss, test_err, test_sub_loss = test_save(testloader, net, criterion, use_cuda)
 
             # save loss and weights in each tiny step in every epoch
@@ -454,7 +416,7 @@ if __name__ == '__main__':
                                 mdict={'sub_weights': sub_weights,'sub_loss': sub_loss, 'test_sub_loss': test_sub_loss},
                                 )            
         else:
-            loss, train_err, hist_noise, layerWise_norms = train(trainloader, net, criterion, optimizer, use_cuda)
+            loss, train_err, grads = train(trainloader, net, criterion, optimizer, use_cuda)
             test_loss, test_err = test(testloader, net, criterion, use_cuda)
 
         status = 'e: %d loss: %.5f train_err: %.3f test_top1: %.3f test_loss %.5f \n' % (epoch, loss, train_err, test_err, test_loss)
@@ -467,9 +429,7 @@ if __name__ == '__main__':
         # record training history (starts at initial point)
         training_history.append([loss, 100 - train_err])
         testing_history.append([test_loss, acc])
-        weight_grad_history.append(layerWise_norms)            
-        # grandient noise            
-        noise_norm_history_TRAIN.append(hist_noise) 
+        grads_history.append(grads)
 
         # save state for landscape on every epoch
         state = {
@@ -483,17 +443,11 @@ if __name__ == '__main__':
         torch.save(state, 'trained_nets/' + save_folder + '/model_' + str(epoch) + '.t7')
         torch.save(opt_state, 'trained_nets/' + save_folder + '/opt_state_' + str(epoch) + '.t7')
 
-                   
-
-        # if int(epoch) == 150 or int(epoch) == 225 or int(epoch) == 275:
-        #     lr *= args.lr_decay
-        #     for param_group in optimizer.param_groups:
-        #         param_group['lr'] *= args._lr_decay
-
+   
     f.close()
 
     sio.savemat('trained_nets/' + save_folder + '/' + args.model + '_gradient_noise.mat',
-                        mdict={'training_history': training_history,'testing_history': testing_history,'train_noise_norm': noise_norm_history_TRAIN,'weight_grad_history': weight_grad_history},
+                        mdict={'training_history': training_history,'testing_history': testing_history,'grads_history':grads_history},
                         )
 
     #--------------------------------------------------------------------------
