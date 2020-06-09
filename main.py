@@ -429,7 +429,7 @@ if __name__ == '__main__':
         # record training history (starts at initial point)
         training_history.append([loss, 100 - train_err])
         testing_history.append([test_loss, acc])
-        grads_history.append(grads)
+        grads_history.append(grads.numpy())
 
         # save state for landscape on every epoch
         state = {
@@ -445,8 +445,8 @@ if __name__ == '__main__':
 
    
     f.close()
-
-    sio.savemat('trained_nets/' + save_folder + '/' + args.model + '_gradient_noise.mat',
+ 
+    sio.savemat('trained_nets/' + save_folder + '/' + args.model + '_gradient_log.mat',
                         mdict={'training_history': training_history,'testing_history': testing_history,'grads_history':grads_history},
                         )
 

@@ -2,7 +2,7 @@
 clear
 close all
 %% load data
-d = dir('Z:\PRJ-THAP\epoch\resnet14_sgd_lr=*_bs=1024_wd=0_mom=0_save_epoch=*'); % 0.001,0.01,0.05,0.5
+d = dir('/path/to/DNNs/with/different/learning/rate'); % 0.001,0.01,0.05,0.5
 for ii = 1:length(d)
 datax_dir = dir(fullfile(d(ii).folder,d(ii).name,'*data_part*'));
 
@@ -19,7 +19,7 @@ for part = 1:length(datax_dir)-1
 end
 end
 
-d = dir('X:\Project3\resnet14_sgd_lr=*_bs=1024_wd=0_mom=0_save_epoch=1');
+d = dir('/path/to/DNNs/with/different/learning/rate');
 ii=1;
 datax_dir = dir(fullfile(d(ii).folder,d(ii).name,'*data_part*'));
 
@@ -243,6 +243,5 @@ set(gca,'xscale','log','yscale','log','xtick',[],'ytick',[])
 set(gcf, 'PaperPositionMode', 'auto');
 
 % output
-print( '-painters' ,'X:\Project3\outputfigures\lr_diffusion.eps','-depsc','-r300')
-% print('-painters' ,'/import/headnode1/gche4213/Project3/outputfigures/lr_diffusion.svg','-dsvg','-r300')
+print( '-painters' ,'Supplementary_Figure4.eps','-depsc','-r300')
 

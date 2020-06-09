@@ -1,7 +1,7 @@
 clear
 close all
 %% load data
-d = dir('*net*');
+d = dir('/trained_nets/resnet*');
 ii = 2;
 datax_dir = dir(fullfile(d(ii).folder,d(ii).name,'*data_part*'));
 loss_all = [];
@@ -133,7 +133,7 @@ set(gca,'xscale','log','yscale','log','xtick',[],'ytick',[])
 set(gcf, 'PaperPositionMode', 'auto');
 
 % output
-print('-painters' ,'fractal_landscape_path.svg','-dsvg','-r300')
+print('-painters' ,'fig3.svg','-dsvg','-r300')
 function [distance_coarse,MSL_coarse] = coarse_grain(distance,MSL,coarse_num)
 % coarse grain for visualization
 Dis_coarse = linspace(min(distance),max(distance),coarse_num+1);

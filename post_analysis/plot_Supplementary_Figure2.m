@@ -2,7 +2,7 @@
 clear
 close all
 %% load data
-d = dir('/import/headnode1/gche4213/Project3/*net*');
+d = dir('/trained_nets/resnet*');
 ii = 2;
 
 datax_dir = dir(fullfile(d(ii).folder,d(ii).name,'*data_part*'));
@@ -65,7 +65,8 @@ figure('NumberTitle','off','name', 'trapping', 'units', 'centimeters', ...
     'color','w', 'position', [0, 0, figure_width, figure_hight], ...
     'PaperSize', [figure_width, figure_hight]); % this is the trick!
 %Hessian eigenvalue
-load('/import/headnode1/gche4213/Project3/other/eigen_hessian_resnet14_128.mat')
+Hessian_dir = dir(fullfile(d(ii).folder,d(ii).name,'eigen_hessian*128.mat'));
+load(fullfile(Hessian_dir.folder,Hessian_dir.name))
 hold on
 map = parula(20);
 for k=1:20
@@ -79,6 +80,5 @@ set(gca,'linewidth',linewidth,'fontsize',fontsize,'tickdir','out')
 set(gcf, 'PaperPositionMode', 'auto');
 
 % output
-% print( '-painters' ,'/import/headnode1/gche4213/Project3/outputfigures/superdiffusion2.jpg','-djpeg','-r300')
-print('-painters' ,'/import/headnode1/gche4213/Project3/outputfigures/hessian.svg','-dsvg','-r300')
+print('-painters' ,'Supplementary_Figure2.svg','-dsvg','-r300')
 
