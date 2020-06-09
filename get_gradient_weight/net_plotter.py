@@ -6,7 +6,7 @@ import torch
 import copy
 from os.path import exists, commonprefix
 import h5py
-import h5_util
+import get_gradient_weight.h5_util
 import model_loader
 
 ################################################################################

@@ -22,10 +22,10 @@ pip install -r requirements.txt
 To train the model(s) in the paper, run this command:
 
 ```train
-python -m main --model='resnet14' --epochs=500  --batch_size=1024
-python -m main --model='resnet20' --epochs=500  --batch_size=1024
-python -m main --model='resnet14_noshort' --epochs=500  --batch_size=1024
-python -m main --model='resnet20_noshort' --epochs=500  --batch_size=1024
+python -m main --model=resnet14 --epochs=500  --batch_size=1024
+python -m main --model=resnet20 --epochs=500  --batch_size=1024
+python -m main --model=resnet14_noshort --epochs=500  --batch_size=1024
+python -m main --model=resnet20_noshort --epochs=500  --batch_size=1024
 ```
 
 All available models are in folder /train_DNN_code/
@@ -61,6 +61,9 @@ matlab  -nodisplay  -r "cd('${MATLAB_SOURCE_PATH1}'), addpath(genpath(cd)), cd('
                                                    cd('${MATLAB_SOURCE_PATH2}'), addpath(genpath(cd)), cd('${WORKDIR}'), \
 						   cd('${DATA_DIR}'), ${MATLAB_PROCESS_FUNC}(${LANDSCAPE_TYPE}), exit"
 ```
+## PBS
+
+If you have PBS system, you can simply run the script /PBS_script/all_in_on.sh.
 
 ## Results
 

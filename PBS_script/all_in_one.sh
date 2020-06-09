@@ -15,7 +15,7 @@ params=`sed "${PBS_ARRAY_INDEX}q;d" job_params`
 param_array=( $params )
 
 # training DNN
-python -m get_gradient_weight.main --model=${param_array[0]} --epochs=500  --batch_size=1024
+python -m main --model=${param_array[0]} --epochs=500  --batch_size=1024
 
 # hessian
 python hessian.compute_hessian_eig_GZ.py --cuda --batch_size=128 --model=${param_array[0]} --model_folder='path/to/trained_nets/'${param_array[0]}'_sgd_lr=0.1_bs=1024_wd=0_mom=0_save_epoch=1' --num_eigenthings=20

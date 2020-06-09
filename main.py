@@ -18,7 +18,7 @@ import torch.nn.parallel
 import model_loader as ml
 
 import get_gradient_weight.net_plotter as net_plotter
-from get_gradient_weight.gradient_noise import get_layerWise_norms, get_grads, alpha_estimator, alpha_estimator2, compute_hessian
+from get_gradient_weight.gradient_noise import get_grads
 
 import train_DNN_code.model_loader as model_loader
 from train_DNN_code.dataloader import get_data_loaders
