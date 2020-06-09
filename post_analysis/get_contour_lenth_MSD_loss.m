@@ -1,7 +1,6 @@
 function [MSD,Mean_contourlength,tau,MSD_forcontour,MSL_contourlength,contour_length,MSL_distance,distance,Displacement_all,Contour_length_all] = get_contour_lenth_MSD_loss(Trajectory)
 
 % measures the mean squared displacement (MSD) from a trajectory.
-% The code is written by Guozhang Chen, Oct 14. USYD.
 
 % This code contains no loop. Each step is "vectorized", therefore pretty
 % fast.
