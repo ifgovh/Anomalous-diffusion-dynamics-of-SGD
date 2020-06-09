@@ -1,7 +1,7 @@
 clear
 close all
 %% load data
-d = dir('*net*');
+d = dir('trained_nets/resnet*');
 ii = 2;
 
 datax_dir = dir(fullfile(d(ii).folder,d(ii).name,'*data_part*'));
@@ -153,16 +153,17 @@ set(gca,'linewidth',linewidth,'fontsize',fontsize,'tickdir','out','TickLength',[
 
 
 % gradient
-load('/import/headnode1/gche4213/Project3/plot_data/gradient_dist.mat')
+G_dir = dir(d(ii).folder,'*gradient_log.mat');
+load(fullfile(G_dir.folder,G_dir.name))
 subaxis(total_row,total_column,1,2,'SpacingHoriz',SH,...
     'SpacingVert',SV,'MR',MR,'ML',ML,'MT',MT,'MB',MB);
 hold on
 kk = 1;
 factor = 0.2576/782.7;% shift the wrong normalization of matlab
-[N,edges] = histcounts(grad{kk},651,'normalization','pdf');
+[N,edges] = histcounts(grad,651,'normalization','pdf');
 plot(edges(2:end),N*factor,'ko')
-plot(linspace(-0.05,0.05,5000),pdf(F{kk},linspace(-0.05,0.05,5000))*factor,'m-');
-ttt = grad{kk}(randperm(numel(grad{kk}),2000));
+plot(linspace(-0.05,0.05,5000),pdf(F,linspace(-0.05,0.05,5000))*factor,'m-');
+ttt = grad(randperm(numel(grad),2000));
 F_G = fitdist(ttt(:),'normal');
 plot(linspace(-0.05,0.05,5000),pdf(F_G,linspace(-0.05,0.05,5000))*factor,'b-');
 xlim([-0.006,0.006])
@@ -179,7 +180,7 @@ set(gca,'linewidth',linewidth,'fontsize',fontsize,'tickdir','out','TickLength',[
 % log-log scale
 insect = axes('position',[0.22191928075833 0.337979094076655 0.080428938438048 0.108139095130109]);
 axis(insect);box on;
-plot(linspace(0,0.2,1000),pdf(F{kk},linspace(0,0.2,1000)),'m-');
+plot(linspace(0,0.2,1000),pdf(F,linspace(0,0.2,1000)),'m-');
 % axis([1,1e3,1e-2,1e2])
 set(get(gca,'Ylabel'),'rotation',-45)
 set(gca,'xscale','log','yscale','log','tickdir','out','TickLength',[TickLength 0.035]) 
@@ -208,10 +209,8 @@ set(gca,'linewidth',linewidth,'fontsize',fontsize,'tickdir','out','TickLength',[
 subaxis(total_row,total_column,3,2,'SpacingHoriz',SH,...
     'SpacingVert',SV,'MR',MR,'ML',ML,'MT',MT,'MB',MB);
 var_win = 100;
-% instant_var = movvar(loss_all{ii},[0,var_win]);
-% instant_var =  instant_var(1:var_win:end);
-% save('/import/headnode1/gche4213/Project3/plot_data/mov_var_ResNet14.mat','instant_var')
-load('/import/headnode1/gche4213/Project3/plot_data/mov_var_ResNet14.mat','instant_var')
+instant_var = movvar(loss_all{ii},[0,var_win]);
+instant_var =  instant_var(1:var_win:end);
 plot(1:var_win:numel(loss_all{ii}),instant_var,'linewidth',linewidth,'color','k')
 axis([-200,24000,0,0.005])
 x = xlabel('Time (step)');

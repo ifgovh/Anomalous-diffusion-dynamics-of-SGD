@@ -215,6 +215,5 @@ set(gca,'linewidth',linewidth,'fontsize',fontsize,'tickdir','out')
 set(gcf, 'PaperPositionMode', 'auto');
 
 % output
-% print('-painters' ,'/import/headnode1/gche4213/Project3/outputfigures/depth_batch_size.svg','-dsvg','-r300')
-% print('-painters' ,'/import/headnode1/gche4213/Project3/outputfigures/depth_batch_size.pdf','-dpdf','-r300')
-% print('-painters' ,'/import/headnode1/gche4213/Project3/outputfigures/depth_batch_size.eps','-depsc','-r300')
+print('-painters' ,'Supplementary_Figure3.svg','-dsvg','-r300')
+

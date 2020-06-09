@@ -92,4 +92,4 @@ for rd = 1:num_rd
     G_pool = [gradient_x{rd},gradient_y{rd}];
     pdf_G{rd} = fitdist(G_pool','stable');
 end
-save(['simplified_model_',landscape_type,'.mat'],'X','Y','pdf_G','pdf_Tr','gradient_y','gradient_x','land_ind','eta','eta2','noise','-v7.3')
+save(['../simplified_model/simplified_model_',landscape_type,'.mat'],'X','Y','pdf_G','pdf_Tr','gradient_y','gradient_x','land_ind','eta','eta2','noise','-v7.3')

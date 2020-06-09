@@ -20,9 +20,9 @@ figure('NumberTitle','off','name', 'trapping', 'units', 'centimeters', ...
 % toy model trajectory and landscape
 cc = subaxis(total_row,total_column,1,1,'SpacingHoriz',SH,...
     'SpacingVert',SV,'MR',MR,'ML',ML,'MT',MT,'MB',MB);
-load('/import/headnode1/gche4213/Project3/test_toy/test_toy_fractal.mat','X','Y','land_ind')
+load('/simplified_model/test_toy_fractal.mat','X','Y','land_ind')
 spatial_epson = 1e-3;
-L = load('/import/headnode1/gche4213/Project3/post_analysis/bigger_fractal_landscape.mat');
+L = load('/post_analysis/bigger_fractal_landscape.mat');
 x = L.x;
 y = L.y;
 zz = L.zz;
@@ -103,22 +103,19 @@ subaxis(total_row,total_column,3,1,'SpacingHoriz',SH,...
     'SpacingVert',SV,'MR',MR,'ML',ML,'MT',MT,'MB',MB);
 
 % fractal landscape
-load('/import/headnode1/gche4213/Project3/test_toy/test_toy_fractal.mat')
-d = dir('/import/headnode1/gche4213/Project3/test_toy/good_figures/*jpg');
-for ii = 1:length(d)
-    G_f(:,ii) = [gradient_x{str2num(d(ii).name(6:end-4))},gradient_y{str2num(d(ii).name(6:end-4))}];
+load('/simplified_model/test_toy_fractal.mat')
+for ii = 1:length(gradient_x)
+    G_f(:,ii) = [gradient_x{ii},gradient_y{ii}];
 end
 % Convex landscape
-load('/import/headnode1/gche4213/Project3/test_toy_gaussian/test_toy_fractal.mat')
-d = dir('/import/headnode1/gche4213/Project3/test_toy_gaussian/*jpg');
+load('/simplified_model/test_toy_gaussian.mat')
 for ii = 1:length(d)
-    G_c(:,ii) = [gradient_x{str2num(d(ii).name(6:end-4))},gradient_y{str2num(d(ii).name(6:end-4))}];
+    G_c(:,ii) = [gradient_x{ii},gradient_y{ii}];
 end
 % randomly shuffled landscape
-load('/import/headnode1/gche4213/Project3/test_toy_shuffle/test_toy_shuffle_fractal.mat')
-d = dir('/import/headnode1/gche4213/Project3/test_toy_shuffle/*jpg');
+load('/simplified_model/test_toy_shuffle_fractal.mat')
 for ii = 1:length(d)
-    G_r(:,ii) = [gradient_x{str2num(d(ii).name(14:end-4))},gradient_y{str2num(d(ii).name(14:end-4))}];
+    G_r(:,ii) = [gradient_x{ii},gradient_y{ii}];
 end
 
 hold on
@@ -142,10 +139,11 @@ text(-0.18,1.15,'c','fontsize',fontsize,'Units', 'Normalized', 'FontWeight','bol
 % set(gca,'xscale','log','yscale','log','tickdir','out') 
 
 % color-encoded step size
-load('/import/headnode1/gche4213/Project3/test_toy/test_toy_fractal.mat','X','Y','land_ind')
+load('/simplified_model/test_toy_fractal.mat','X','Y','land_ind')
 subaxis(total_row,total_column,1,2,'SpacingHoriz',SH,...
     'SpacingVert',SV,'MR',MR,'ML',ML,'MT',MT,'MB',MB);
 hold on
+% one should specify the zoom-in area based on one's own results
 contour(look_up_table(1151:1302),look_up_table(852:1002),landscape(852:1002,1151:1302),30)
 cc = find(X{rd}<0.4,1);
 dd = find(X{rd}<0.14,1);
@@ -162,7 +160,7 @@ text(-0.18,1.15,'d','fontsize',fontsize,'Units', 'Normalized', 'FontWeight','bol
 % random landscape
 subaxis(total_row,total_column,2,2,'SpacingHoriz',SH,...
     'SpacingVert',SV,'MR',MR,'ML',ML,'MT',MT,'MB',MB);
-load('/import/headnode1/gche4213/Project3/test_toy_shuffle/1000/test_toy_shuffle_fractal.mat','X','Y','landscape_pool')
+load('/simplified_model/test_toy_shuffle_fractal.mat','X','Y','landscape_pool')
 rd = 1;
 hold on
 contour(look_up_table,look_up_table,landscape_pool{rd})
@@ -178,13 +176,13 @@ subaxis(total_row,total_column,3,2,'SpacingHoriz',SH,...
 hold on
 
 % convex
-convex_data = load('/import/headnode1/gche4213/Project3/test_toy_gaussian/test_toy_fractal.mat');
+convex_data = load('/simplified_model/test_toy_gaussian.mat');
 [MSD_convex,tau_convex] = get_MSD([convex_data.X{1}(1:144),convex_data.Y{1}(1:144),(1:144)']);
 loglog(tau_convex,MSD_convex,'k-','linewidth',linewidth)
 C = plot(tau_convex(round(numel(tau_initial)/5)),MSD_convex(round(numel(tau_initial)/5)),'k^');
 
 % random
-rand_data = load('/import/headnode1/gche4213/Project3/test_toy_shuffle/1000/test_toy_shuffle_fractal.mat');
+rand_data = load('/simplified_model/test_toy_shuffle_fractal.mat');
 [MSD_rand,tau_rand] = get_MSD([rand_data.X{1},rand_data.Y{1},t]);
 loglog(tau_rand,MSD_rand,'k-','linewidth',linewidth)
 R = plot(tau_rand(round(numel(tau_initial)/5)),MSD_rand(round(numel(tau_initial)/5)),'kx');
@@ -202,4 +200,4 @@ text(-0.18,1.15,'f','fontsize',fontsize,'Units', 'Normalized', 'FontWeight','bol
 set(gcf, 'PaperPositionMode', 'auto');
 
 % output
-print('-painters' ,'/import/headnode1/gche4213/Project3/outputfigures/toy_model10.svg','-dsvg','-r300')
+print('-painters' ,'fig4.svg','-dsvg','-r300')

@@ -1,7 +1,7 @@
 clear
 close all
 %% load data
-d = dir('*net*');
+d = dir('/trained_nets/resnet*');
 ii = 2;
 
 datax_dir = dir(fullfile(d(ii).folder,d(ii).name,'*data_part*'));
@@ -100,7 +100,7 @@ set(gca, 'Position', originalSize);
 % long MSD
 cc = subaxis(total_row,total_column,2,1,'SpacingHoriz',SH,...
     'SpacingVert',SV,'MR',MR,'ML',ML,'MT',MT,'MB',MB);
-d_long = dir('/import/headnode1/gche4213/Project3/other/resnet14_512/_*mat');
+d_long = dir('/path/to/a/long/trial/_*mat');% one should change the parameter "steps_in_part" in SGD_analysis_step_level.m
 hold on
 select_num = 5;
 map = jet(select_num);
@@ -127,4 +127,4 @@ set(gca, 'Position', originalSize);
 set(gcf, 'PaperPositionMode', 'auto');
 
 % output
-print('-painters' ,'superdiffusion_SI.svg','-dsvg','-r300')
+print('-painters' ,'Supplementary_Figure1.svg','-dsvg','-r300')
