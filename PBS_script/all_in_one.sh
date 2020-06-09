@@ -6,7 +6,7 @@
 #PBS -l mem=30GB
 #PBS -e PBSout/
 #PBS -o PBSout/
-#PBS -J 1-5
+#PBS -J 1-8
 
 DATA_DIR="/path/to/this/repo"
 cd ${DATA_DIR}
