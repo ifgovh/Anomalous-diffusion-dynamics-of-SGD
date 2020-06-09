@@ -56,16 +56,28 @@ WORKDIR="/path/to/working/directory"
 
 for i in 1 2 3 4
 do
-    matlab  -nodisplay  -r "cd('${MATLAB_SOURCE_PATH1}'), addpath(genpath(cd)), cd('${WORKDIR}') , \
+    matlab  -nodisplay  -r "cd('${MATLAB_SOURCE_PATH}'), addpath(genpath(cd)), cd('${WORKDIR}') , \
                                                     cd('${MATLAB_SOURCE_PATH2}'), addpath(genpath(cd)), cd('${WORKDIR}'), \
                                                     cd('${DATA_DIR}'), ${MATLAB_PROCESS_FUNC}(${i}), exit"
 done
 ```
 
-
 ## PBS
 
 If you have PBS system, you can simply run the script /PBS_script/all_in_on.sh but you have to change the directory in code accordingly.
+
+## Plot
+
+To reproduce the figures in the paper, run below scripts in Matlab.
+
+plot_fig2.m
+plot_fig3.m
+plot_fig4.m
+plot_Supplementary_Figure1.m
+plot_Supplementary_Figure2.m
+plot_Supplementary_Figure3.m
+plot_Supplementary_Figure4.m
+
 
 ## Results
 
