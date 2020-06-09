@@ -1,4 +1,4 @@
-# My Paper Title
+# Anomalous diffusion dynamics of learning in deep neural networks
 
 This repository is the official implementation of "Anomalous diffusion dynamics of learning in deep neural networks, 2020". 
 
@@ -78,6 +78,6 @@ If you find this code useful in your research, please cite (currently, it is und
 Anomalous diffusion dynamics of learning in deep neural networks,under review
 
 # Acknowledgements
-[1] Hao Li, Zheng Xu, Gavin Taylor, Christoph Studer, Tom Goldstein. On large-batch training for deep learning: Generalization gap and sharp minima. ICLR, 2017.
-[2] Nicolas Douillet (2020). Fractal landscape generator (https://www.mathworks.com/matlabcentral/fileexchange/73273-fractal-landscape-generator), MATLAB Central File Exchange. Retrieved June 9, 2020.
-[3] Noah Golmant, Zhewei Yao, Amir Gholami, Michael Mahoney, Joseph Gonzalez. pytorch-hessian-eigentings: efficient PyTorch Hessian eigendecomposition., https://github.com/noahgolmant/pytorch-hessian-eigenthings, 2018.
+[1] Hao Li, Zheng Xu, Gavin Taylor, Christoph Studer, Tom Goldstein. On large-batch training for deep learning: Generalization gap and sharp minima. ICLR, 2017.  
+[2] Nicolas Douillet (2020). Fractal landscape generator (https://www.mathworks.com/matlabcentral/fileexchange/73273-fractal-landscape-generator), MATLAB Central File Exchange. Retrieved June 9, 2020.  
+[3] Noah Golmant, Zhewei Yao, Amir Gholami, Michael Mahoney, Joseph Gonzalez. pytorch-hessian-eigentings: efficient PyTorch Hessian eigendecomposition., https://github.com/noahgolmant/pytorch-hessian-eigenthings, 2018.  
