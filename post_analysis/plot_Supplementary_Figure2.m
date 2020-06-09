@@ -65,8 +65,8 @@ figure('NumberTitle','off','name', 'trapping', 'units', 'centimeters', ...
     'color','w', 'position', [0, 0, figure_width, figure_hight], ...
     'PaperSize', [figure_width, figure_hight]); % this is the trick!
 %Hessian eigenvalue
-Hessian_dir = dir(fullfile(d(ii).folder,d(ii).name,'eigen_hessian*128.mat'));
-load(fullfile(Hessian_dir.folder,Hessian_dir.name))
+Hessian_dir = dir(fullfile(d(ii).folder,d(ii).name,'eigen_hessian*.mat'));
+load(fullfile(Hessian_dir(100).folder,Hessian_dir(100).name))
 hold on
 map = parula(20);
 for k=1:20
