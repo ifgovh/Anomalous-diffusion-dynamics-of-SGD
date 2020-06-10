@@ -75,8 +75,14 @@ end
 xlim([1,500])
 xlabel('Epoch')
 ylabel('Eigenvalue')
-set(gca,'linewidth',linewidth,'fontsize',fontsize,'tickdir','out')
 
+originalSize = get(gca, 'Position');
+caxis([1,20])
+c = colorbar('Position', [originalSize(1) + originalSize(3) + 0.01  originalSize(2) 0.008 originalSize(4) ],'location','east');
+T = title(c,'Order of eigenvalue','fontsize',fontsize);
+set(gca, 'Position', originalSize);
+
+set(gca,'linewidth',linewidth,'fontsize',fontsize,'tickdir','out')
 set(gcf, 'PaperPositionMode', 'auto');
 
 % output
