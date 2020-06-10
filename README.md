@@ -2,7 +2,7 @@
 
 This repository is the official implementation of "Anomalous diffusion dynamics of learning in deep neural networks, 2020". 
 
-As the SGD can be regarded as a random walker moves on a non-convex and high-dimensional loss-landscape, we use the mean-squared displacement (MSD) to quantify the diffusive process of the SGD training process.
+As SGD can be regarded as a random walker moves on a non-convex and high-dimensional loss-landscape, we use the mean-squared displacement (MSD) to quantify the diffusive process of the SGD training process.
 Furthermore, we found that the anomalous diffusion dynamics of SGD is due to the interaction of SGD and fractal-like loss-landscape.
 
 ![schematic](doc/images/schematic.png)
@@ -64,7 +64,7 @@ done
 
 ## PBS
 
-If you have PBS system, you can simply run the script /PBS_script/all_in_on.sh but you have to change the directory in code accordingly.
+If you have a PBS system, you can simply run the script /PBS_script/all_in_on.sh but you have to change the directory in code accordingly.
 
 ## Plot
 
