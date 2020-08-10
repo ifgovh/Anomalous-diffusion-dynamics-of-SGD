@@ -306,6 +306,7 @@ if __name__ == '__main__':
     parser.add_argument('--label_corrupt_prob', type=float, default=0.0)
     parser.add_argument('--trainloader', default='', help='path to the dataloader with random labels')
     parser.add_argument('--testloader', default='', help='path to the testloader with random labels')
+    parser.add_argument('--synthetic_gaussian', default=[False,False,False,False], help='falts for using synthetic_gaussian dataset, [bright,contrast,saturation,hue]')
 
     parser.add_argument('--idx', default=0, type=int, help='the index for the repeated experiment')
 
@@ -339,7 +340,10 @@ if __name__ == '__main__':
 
     f = open('trained_nets/' + save_folder + '/log.out', 'a')
 
-    trainloader, testloader, trainset = get_data_loaders(args)
+    if not sum(args.synthetic_gaussian):
+        trainloader, testloader, trainset = get_data_loaders(args)
+    else:
+        trainloader, testloader, trainset = get_synthetic_gaussian_data_loaders(args)
 
     if args.label_corrupt_prob and not args.resume_model:
         torch.save(trainloader, 'trained_nets/' + save_folder + '/trainloader.dat')
