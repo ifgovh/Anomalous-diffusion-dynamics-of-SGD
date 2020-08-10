@@ -1,4 +1,5 @@
 from __future__ import print_function
+import torch
 import os
 import random
 import numpy as np
@@ -6,7 +7,6 @@ import argparse
 import scipy.io as sio
 import math
 
-import torch
 import torch.nn as nn
 import torch.nn.init as init
 import torch.optim as optim
@@ -21,7 +21,8 @@ import get_gradient_weight.net_plotter as net_plotter
 from get_gradient_weight.gradient_noise import get_grads
 
 import train_DNN_code.model_loader as model_loader
-from train_DNN_code.dataloader import get_data_loaders
+from train_DNN_code.dataloader import get_data_loaders 
+from train_DNN_code.dataloader import get_synthetic_gaussian_data_loaders
 
 def init_params(net):
     for m in net.modules():
@@ -52,6 +53,12 @@ def train_save(trainloader, net, criterion, optimizer, use_cuda=True):
         for batch_idx, (inputs, targets) in enumerate(trainloader):
             batch_size = inputs.size(0)
             total += batch_size
+            import pdb
+            import numpy as np
+            import matplotlib.pyplot as plt
+            aa=inputs.numpy()
+            plt.imshow(aa[1,1,:]);plt.show()
+            pdb.set_trace()
             if use_cuda:
                 inputs, targets = inputs.cuda(), targets.cuda()
             optimizer.zero_grad()
@@ -306,7 +313,7 @@ if __name__ == '__main__':
     parser.add_argument('--label_corrupt_prob', type=float, default=0.0)
     parser.add_argument('--trainloader', default='', help='path to the dataloader with random labels')
     parser.add_argument('--testloader', default='', help='path to the testloader with random labels')
-    parser.add_argument('--synthetic_gaussian', default=[False,False,False,False], help='falts for using synthetic_gaussian dataset, [bright,contrast,saturation,hue]')
+    parser.add_argument('--synthetic_gaussian', default=[True,False,False,False], help='falts for using synthetic_gaussian dataset, [bright,contrast,saturation,hue]')
 
     parser.add_argument('--idx', default=0, type=int, help='the index for the repeated experiment')
 
@@ -463,7 +470,6 @@ if __name__ == '__main__':
         net = ml.load('cifar10', args.model, model_file)
         w = net_plotter.get_weights(net) # initial parameters
         #s = copy.deepcopy(net.state_dict()) # deepcopy since state_dict are references
-        #import pdb; pdb.set_trace()        
         for j in range(len(w)):
             w[j] = w[j].cpu().numpy()
 

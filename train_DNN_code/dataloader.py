@@ -8,7 +8,7 @@ import numbers
 import random
 from typing import Tuple, List
 
-from . import functional as F
+from torchvision.transforms import functional as F
 
 def get_data_loaders(args):
     if args.trainloader and args.testloader:
@@ -181,8 +181,9 @@ def get_synthetic_gaussian_data_loaders(args):
             transform_train = transforms.Compose([
                 transforms.RandomCrop(32, padding=4),
                 transforms.RandomHorizontalFlip(),
-                GaussianColorJitter(brightness=args.synthetic_gaussian[0], contrast=args.synthetic_gaussian[1], 
-                    saturation=args.synthetic_gaussian[2], hue=args.synthetic_gaussian[3])
+                #GaussianColorJitter(brightness=args.synthetic_gaussian[0], contrast=args.synthetic_gaussian[1], 
+                #    saturation=args.synthetic_gaussian[2], hue=args.synthetic_gaussian[3]),
+                transforms.ColorJitter(brightness=0.5, contrast=0.5, saturation=0.5, hue=0.5),
                 transforms.ToTensor(),
                 normalize,
             ])
@@ -191,8 +192,9 @@ def get_synthetic_gaussian_data_loaders(args):
             transform_train = transforms.Compose([
                 transforms.ToTensor(),
                 normalize,
-                GaussianColorJitter(brightness=args.synthetic_gaussian[0], contrast=args.synthetic_gaussian[1], 
-                    saturation=args.synthetic_gaussian[2], hue=args.synthetic_gaussian[3])
+                #GaussianColorJitter(brightness=args.synthetic_gaussian[0], contrast=args.synthetic_gaussian[1], 
+                #    saturation=args.synthetic_gaussian[2], hue=args.synthetic_gaussian[3]),
+                transforms.ColorJitter(brightness=0.5, contrast=0.5, saturation=0.5, hue=0.5),
                 transforms.ToTensor(),
             ])
 
