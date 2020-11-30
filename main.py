@@ -114,12 +114,14 @@ def train_save(trainloader, net, criterion, optimizer, use_cuda=True):
 
             train_loss += loss.item()*batch_size
             _, predicted = torch.max(outputs.data, 1)
-            correct += predicted.cpu().eq(targets).cpu().sum().item()
+            correct += predicted.cpu().eq(targets).cpu().sum().item()  
 
     M = len(grads[0]) # total number of parameters
-    grads = torch.cat(grads).view(-1, M)  
-
-    return train_loss/total, 100 - 100.*correct/total, sub_weights, sub_loss, grads
+    grads = torch.cat(grads).view(-1, M)
+    mean_grad = grads.sum(0) / (batch_idx + 1) # divided by # batchs
+    noise_norm = (grads - mean_grad).norm(dim=1)
+  
+    return train_loss/total, 100 - 100.*correct/total, sub_weights, sub_loss, grads, mean_grad, noise_norm
 
 
 def test_save(testloader, net, criterion, use_cuda=True):
@@ -522,12 +524,15 @@ if __name__ == '__main__':
     testing_history = []
     # gradient container
     grads_history = []
+    estimated_full_batch_grad_history = []
+    gradient_noise_norm_history = []
 
     for epoch in range(start_epoch, args.epochs + 1):
         print(epoch)        
         # Save checkpoint.
-        if epoch == 1 or epoch % args.save_epoch == 0 or epoch == 150:
-            loss, train_err, sub_weights, sub_loss, grads = train_save(trainloader, net, criterion, optimizer, use_cuda)
+        if epoch == 1 or epoch % args.save_epoch == 0:
+
+            loss, train_err, sub_weights, sub_loss, grads, estimated_full_batch_grad, gradient_noise_norm = train_save(trainloader, net, criterion, optimizer, use_cuda)
             test_loss, test_err, test_sub_loss = test_save(testloader, net, criterion, use_cuda)
 
             # save loss and weights in each tiny step in every epoch
