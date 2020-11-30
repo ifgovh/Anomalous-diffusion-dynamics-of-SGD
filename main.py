@@ -24,6 +24,11 @@ import train_DNN_code.model_loader as model_loader
 from train_DNN_code.dataloader import get_data_loaders 
 from train_DNN_code.dataloader import get_synthetic_gaussian_data_loaders
 
+import matplotlib
+matplotlib.use('Agg')
+from matplotlib import pyplot as plt
+import powerlaw
+
 def init_params(net):
     for m in net.modules():
         if isinstance(m, nn.Conv2d) or isinstance(m, nn.ConvTranspose2d):
@@ -53,12 +58,8 @@ def train_save(trainloader, net, criterion, optimizer, use_cuda=True):
         for batch_idx, (inputs, targets) in enumerate(trainloader):
             batch_size = inputs.size(0)
             total += batch_size
-            import pdb
-            import numpy as np
-            import matplotlib.pyplot as plt
             aa=inputs.numpy()
             plt.imshow(aa[1,1,:]);plt.show()
-            pdb.set_trace()
             if use_cuda:
                 inputs, targets = inputs.cuda(), targets.cuda()
             optimizer.zero_grad()
