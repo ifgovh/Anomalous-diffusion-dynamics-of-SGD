@@ -220,8 +220,10 @@ def train(trainloader, net, criterion, optimizer, use_cuda=True):
 
     M = len(grads[0]) # total number of parameters
     grads = torch.cat(grads).view(-1, M)
+    mean_grad = grads.sum(0) / (batch_idx + 1) # divided by # batchs
+    noise_norm = (grads - mean_grad).norm(dim=1)
   
-    return train_loss/total, 100 - 100.*correct/total, grads
+    return train_loss/total, 100 - 100.*correct/total, grads, mean_grad, noise_norm
 
 
 def test(testloader, net, criterion, use_cuda=True):
@@ -262,6 +264,111 @@ def test(testloader, net, criterion, use_cuda=True):
             correct += predicted.cpu().eq(targets).cpu().sum().item()
 
     return test_loss/total, 100 - 100.*correct/total
+
+def hypothesis_test_noise(noise):
+    result_arr_R = []
+    result_arr_p = []
+    result_arr_alpha = []
+    result_arr_diff  = []
+    result_arr_sigma = []
+
+
+    index      = []
+    index_counter = 0 
+    #min_num = 1000.0
+    #max_num = 0.0
+
+    for elems in noise:
+        if len(elems) > 0 and index_counter % 1 == 0:
+            #result_arr.append(elems.numpy())
+            fit =  powerlaw.Fit(elems.numpy())        
+            R, p =  fit.distribution_compare('power_law', 'exponential')
+            #print (len(elems.numpy()), fit.alpha, fit.x_min, fit.sigma, R, p)
+            #if np.amin(elems.numpy()) < min_num:
+            #    min_num = np.amin(elems.numpy())
+            #if np.amax(elems.numpy()) > max_num:
+            #    max_num = np.amax(elems.numpy())  
+            result_arr_R.append(R)
+            result_arr_p.append(p)
+            result_arr_diff.append(np.absolute(fit.xmin - np.mean(elems.numpy())))
+            result_arr_alpha.append(fit.alpha)
+            result_arr_sigma.append(fit.sigma)  
+
+
+            index.append(1000 * index_counter)
+        index_counter += 1  
+    #    if index_counter > 50000:
+    #       break  
+
+    plt.figure()
+
+    #import pickle
+    #y1, y2, y3, y4, result_arr_sigma, index = pickle.load(open(Destination_folder + '/Comparisontest.pkl', 'rb'))
+    #y1, y2, y3, y4, result_arr_sigma, index = y1[4:], y2[4:], y3[4:], y4[4:], result_arr_sigma[4:], index[4:]
+
+    #print (index)
+
+    x1 = index#np.linspace(0.0, 5.0)
+    x2 = index#np.linspace(0.0, 2.0)
+    x3 = index
+    x4 = index
+
+
+    y1 = result_arr_R#np.cos(2 * np.pi * x1) * np.exp(-x1)
+    y2 = result_arr_p#np.cos(2 * np.pi * x2)
+    y3 = result_arr_diff
+    y4 = result_arr_alpha
+
+    sio.savemat('trained_nets/' + save_folder + '/' + args.model + '_hypothesis_test.mat',
+                        mdict={'index': index,'result_arr_R': result_arr_R,'result_arr_p':result_arr_p, 
+                        'result_arr_diff':result_arr_diff,
+                        'result_arr_alpha':result_arr_alpha},
+                        )
+
+    plt.subplot(4, 1, 1)
+    plt.plot(x1, y1, 'ko-')
+    #plt.title('Comparison between Power law v/s exponential law fit to SGD noise norm')
+    plt.title('Log likelihood ration between power law and exponential distribution')
+
+
+    plt.subplot(4, 1, 2)
+    plt.plot(x2, y2, 'r.-')
+    plt.plot(x2, np.ones(len(y2)) * 0.1, 'g-')
+    #plt.xlabel('Iterations')
+    plt.ylabel('p value of the test')
+    #plt.savefig(Destination_folder + '/Comparisontest.png')
+
+    plt.subplot(4, 1, 3)
+    plt.plot(x3, y3, 'ko-', label='Absolute Difference in xmin and mean')
+    #plt.title('Comparison of test data')
+    #plt.title('Absolute Difference in xmin and mean')
+    plt.legend(loc='upper left')
+
+
+
+    plt.subplot(4, 1, 4)
+    plt.plot(x4, y4, 'r.-')
+    plt.xlabel('Iterations')
+    plt.ylabel('Fitted alpha')
+    plt.savefig(Destination_folder + '/Comparisontest.png')
+    #import pickle
+    #pickle.dump([y1, y2, y3, y4, result_arr_sigma, index], open(Destination_folder + '/Comparisontest.pkl', 'wb'))
+
+
+    plt.gcf().clear()
+
+
+    plt.subplot(2, 1, 1)
+    plt.plot(index, result_arr_sigma, 'ko-')
+    plt.ylabel('Stddev in alpha computation')
+    plt.title('Power law fit statstics')
+
+    plt.subplot(2, 1, 2)
+    plt.plot(index, y4, 'ko-')
+    plt.xlabel('Iterations')
+    plt.ylabel('Fitted alpha')
+
+    plt.savefig('trained_nets/' + save_folder + '/' + args.model + '/powerlawfit.png')
 
 def name_save_folder(args):
     save_folder = args.model + '_' + str(args.optimizer) + '_lr=' + str(args.lr)
@@ -427,7 +534,7 @@ if __name__ == '__main__':
                                 mdict={'sub_weights': sub_weights,'sub_loss': sub_loss, 'test_sub_loss': test_sub_loss},
                                 )            
         else:
-            loss, train_err, grads = train(trainloader, net, criterion, optimizer, use_cuda)
+            loss, train_err, grads, estimated_full_batch_grad, gradient_noise_norm = train(trainloader, net, criterion, optimizer, use_cuda)
             test_loss, test_err = test(testloader, net, criterion, use_cuda)
 
         status = 'e: %d loss: %.5f train_err: %.3f test_top1: %.3f test_loss %.5f \n' % (epoch, loss, train_err, test_err, test_loss)
@@ -441,6 +548,8 @@ if __name__ == '__main__':
         training_history.append([loss, 100 - train_err])
         testing_history.append([test_loss, acc])
         grads_history.append(grads.numpy())
+        estimated_full_batch_grad_history.append(estimated_full_batch_grad.numpy())
+        gradient_noise_norm_history.append(gradient_noise_norm.numpy())
 
         # save state for landscape on every epoch
         state = {
@@ -458,23 +567,25 @@ if __name__ == '__main__':
     f.close()
  
     sio.savemat('trained_nets/' + save_folder + '/' + args.model + '_gradient_log.mat',
-                        mdict={'training_history': training_history,'testing_history': testing_history,'grads_history':grads_history},
+                        mdict={'training_history': training_history,'testing_history': testing_history,'grads_history':grads_history, 
+                        'estimated_full_batch_grad_history':estimated_full_batch_grad_history,
+                        'gradient_noise_norm_history':gradient_noise_norm_history},
                         )
 
     #--------------------------------------------------------------------------
     # Load weights and save them in a mat file (temporal unit: epoch)
     #--------------------------------------------------------------------------
-    all_weights = []
-    for i in range(0,args.epochs+1,args.save_epoch):
-        model_file = 'trained_nets/' + save_folder + '/' + 'model_' + str(i) + '.t7'
-        net = ml.load('cifar10', args.model, model_file)
-        w = net_plotter.get_weights(net) # initial parameters
-        #s = copy.deepcopy(net.state_dict()) # deepcopy since state_dict are references
-        for j in range(len(w)):
-            w[j] = w[j].cpu().numpy()
+    # all_weights = []
+    # for i in range(0,args.epochs+1,args.save_epoch):
+    #     model_file = 'trained_nets/' + save_folder + '/' + 'model_' + str(i) + '.t7'
+    #     net = ml.load('cifar10', args.model, model_file)
+    #     w = net_plotter.get_weights(net) # initial parameters
+    #     #s = copy.deepcopy(net.state_dict()) # deepcopy since state_dict are references
+    #     for j in range(len(w)):
+    #         w[j] = w[j].cpu().numpy()
 
-        all_weights.append(w)
+    #     all_weights.append(w)
 
-    sio.savemat('trained_nets/' + save_folder + '/' + args.model + 'all_weights.mat',
-                            mdict={'weight': all_weights},
-                            )
+    # sio.savemat('trained_nets/' + save_folder + '/' + args.model + 'all_weights.mat',
+    #                         mdict={'weight': all_weights},
+    #                         )

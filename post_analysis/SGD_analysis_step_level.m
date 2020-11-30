@@ -71,6 +71,7 @@ function calculate_MSD_trajectory(MSD_feed, all_sub_loss, d, GN_dir, part_num)
 fprintf('Calculating MSD part: %d',part_num)
 % calculate MSD
 [MSD,Mean_contourlength,tau,MSD_forcontour,MSL_contourlength,contour_length,MSL_distance,distance,Displacement_all,Contour_length_all] = get_contour_lenth_MSD_loss(MSD_feed);
+[MSD_noaverage,tau_noaverage] = get_no_average_MSD(MSD_feed(:,1:end-1));
 clear MSD_feed
 MSD = gather(MSD);
 Mean_contourlength = gather(Mean_contourlength);
@@ -93,6 +94,6 @@ delta_train_loss = diff(loss);
 %save
 save(fullfile(GN_dir(1).folder,[d.name(1:end-24),'_data_part_',num2str(part_num),'22.mat']),'loss','delta_train_loss',...
     'MSD','Mean_contourlength','tau','MSD_forcontour','MSL_contourlength','contour_length','MSL_distance',...
-    'distance','Displacement_all','Contour_length_all','-append')
+    'distance','Displacement_all','Contour_length_all','MSD_noaverage','tau_noaverage','-append')
 end
 

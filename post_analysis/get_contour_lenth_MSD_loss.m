@@ -11,7 +11,7 @@ function [MSD,Mean_contourlength,tau,MSD_forcontour,MSL_contourlength,contour_le
 % tau is the list of all the possible time intervals within the trajectory.
 % MSD is a list of mean squared displacements, for each value of tau.
 
-% MSD(tau) = sqrt( x(i)^2 - x(i+tau)^2 ), averaged over i.
+% MSD(tau) = x(i)^2 - x(i+tau)^2, averaged over i.
 
 % contour_length is the contour length (path length) of the trajectory 
 % MSD_forcontour is a list of mean squared displacements, for each value of contour_length.
