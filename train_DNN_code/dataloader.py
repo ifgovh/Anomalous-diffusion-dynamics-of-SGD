@@ -1,5 +1,5 @@
 import os
-
+import numpy as np
 import torch
 import torchvision
 import torchvision.transforms as transforms
@@ -48,12 +48,12 @@ def get_data_loaders(args):
 
 
     kwargs = {'num_workers': 2, 'pin_memory': True} if args.ngpu else {}
-    if args.dataset = 'cifar10':
+    if args.dataset == 'cifar10':
         trainset = torchvision.datasets.CIFAR10(root='./data', train=True, download=True,
                                                 transform=transform_train)
         testset = torchvision.datasets.CIFAR10(root='./data', train=False, download=True,
                                                transform=transform_test)
-    elif args.dataset = 'mnist':
+    elif args.dataset == 'mnist':
         trainset = torchvision.datasets.MNIST(root='./data', train=True, download=True,
                                                 transform=transform_train)
         testset = torchvision.datasets.MNIST(root='./data', train=False, download=True,

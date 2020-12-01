@@ -50,6 +50,8 @@ models = {
     'wrn14_4_noshort'       : resnet.WRN14_4_noshort,
     'wrn14_8'               : resnet.WRN14_8,
     'wrn14_8_noshort'       : resnet.WRN14_8_noshort,
+    'resnet14_nobatchnorm'  : resnet.ResNet14_nobatchnorm,
+    'resnet14_noshort_nobatchnorm':resnet.ResNet14_noshort_nobatchnorm,
     
 }
 
