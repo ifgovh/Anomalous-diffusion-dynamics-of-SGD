@@ -26,6 +26,28 @@ class BasicBlock(nn.Module):
         out = F.relu(out)
         return out
 
+class BasicBlock_nobatchnorm(nn.Module):
+    expansion = 1
+
+    def __init__(self, in_planes, planes, stride=1):
+        super(BasicBlock, self).__init__()
+        self.conv1 = nn.Conv2d(in_planes, planes, kernel_size=3, stride=stride, padding=1, bias=False)
+        self.conv2 = nn.Conv2d(planes, planes, kernel_size=3, stride=1, padding=1, bias=False)
+
+        self.shortcut = nn.Sequential()
+        if stride != 1 or in_planes != self.expansion*planes:
+            self.shortcut = nn.Sequential(
+                nn.Conv2d(in_planes, self.expansion*planes, kernel_size=1, stride=stride, bias=False),
+                self.expansion*planes
+            )
+
+    def forward(self, x):
+        out = F.relu(self.conv1(x))
+        out = self.conv2(out)
+        out += self.shortcut(x)
+        out = F.relu(out)
+        return out
+
 class BasicBlock_noshortcut(nn.Module):
     expansion = 1
 
@@ -42,6 +64,19 @@ class BasicBlock_noshortcut(nn.Module):
         out = F.relu(out)
         return out
 
+class BasicBlock_noshortcut_nobatchnorm(nn.Module):
+    expansion = 1
+
+    def __init__(self, in_planes, planes, stride=1):
+        super(BasicBlock_noshortcut, self).__init__()
+        self.conv1 = nn.Conv2d(in_planes, planes, kernel_size=3, stride=stride, padding=1, bias=False)
+        self.conv2 = nn.Conv2d(planes, planes, kernel_size=3, stride=1, padding=1, bias=False)
+
+    def forward(self, x):
+        out = F.relu(self.conv1(x))
+        out = self.bn2(out)
+        out = F.relu(out)
+        return out
 
 class Bottleneck(nn.Module):
     expansion = 4
@@ -69,7 +104,6 @@ class Bottleneck(nn.Module):
         out += self.shortcut(x)
         out = F.relu(out)
         return out
-
 
 class Bottleneck_noshortcut(nn.Module):
     expansion = 4
@@ -347,3 +381,15 @@ def WRN14_8_noshort():
     depth = 14
     n = (depth - 2) // 6
     return WResNet_cifar(BasicBlock_noshortcut, [n,n,n], 8)
+
+
+# no batch normalization#
+def ResNet14_nobatchnorm():
+    depth = 14
+    n = (depth - 2) // 6
+    return ResNet_cifar(BasicBlock_nobatchnorm, [n,n,n])
+
+def ResNet14_noshort_nobatchnorm():
+    depth = 14
+    n = (depth - 2) // 6
+    return ResNet_cifar(BasicBlock_noshortcut_nobatchnorm, [n,n,n])

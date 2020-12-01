@@ -3,7 +3,6 @@
 #PBS -q defaultQ
 #PBS -l select=1:ncpus=1:ngpus=1:mem=24gb
 #PBS -l walltime=100:50:59
-#PBS -l mem=30GB
 #PBS -e PBSout/
 #PBS -o PBSout/
 #PBS -J 1-8

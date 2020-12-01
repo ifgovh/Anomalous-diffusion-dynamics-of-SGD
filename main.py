@@ -21,8 +21,7 @@ import get_gradient_weight.net_plotter as net_plotter
 from get_gradient_weight.gradient_noise import get_grads
 
 import train_DNN_code.model_loader as model_loader
-from train_DNN_code.dataloader import get_data_loaders 
-from train_DNN_code.dataloader import get_synthetic_gaussian_data_loaders
+from train_DNN_code.dataloader import get_data_loaders, get_synthetic_gaussian_data_loaders
 
 import matplotlib
 matplotlib.use('Agg')
@@ -374,13 +373,10 @@ def hypothesis_test_noise(noise):
     plt.savefig('trained_nets/' + save_folder + '/' + args.model + '/powerlawfit.png')
 
 def name_save_folder(args):
-    save_folder = args.model + '_' + str(args.optimizer) + '_lr=' + str(args.lr)
-    if args.lr_decay != 0.1:
-        save_folder += '_lr_decay=' + str(args.lr_decay)
-    save_folder += '_bs=' + str(args.batch_size)
-    save_folder += '_wd=' + str(args.weight_decay)
-    save_folder += '_mom=' + str(args.momentum)
-    save_folder += '_save_epoch=' + str(args.save_epoch)
+    save_folder = args.model + '_epoch' + str(args.epochs) + '_lr=' + str(args.lr)
+
+    save_folder += '_bs=' + str(args.batch_size) + '_data_' + str(args.dataset)
+    
     if args.loss_name != 'crossentropy':
         save_folder += '_loss=' + str(args.loss_name)
     if args.noaug:
@@ -399,9 +395,9 @@ def name_save_folder(args):
 if __name__ == '__main__':
     # Training options
     parser = argparse.ArgumentParser(description='PyTorch CIFAR10 Training')
+    parser.add_argument('--dataset', default='cifar10', type=str, help='mnist | cifar10 | gauss')
     parser.add_argument('--batch_size', default=128, type=int)
     parser.add_argument('--lr', default=0.1, type=float, help='learning rate')
-    parser.add_argument('--lr_decay', default=0.1, type=float, help='learning rate decay rate')
     parser.add_argument('--optimizer', default='sgd', help='optimizer: sgd | adam')
     parser.add_argument('--weight_decay', default=0, type=float)#0.0005
     parser.add_argument('--momentum', default=0, type=float)#0.9
@@ -423,14 +419,18 @@ if __name__ == '__main__':
     parser.add_argument('--label_corrupt_prob', type=float, default=0.0)
     parser.add_argument('--trainloader', default='', help='path to the dataloader with random labels')
     parser.add_argument('--testloader', default='', help='path to the testloader with random labels')
-    parser.add_argument('--synthetic_gaussian', default=[True,False,False,False], help='falts for using synthetic_gaussian dataset, [bright,contrast,saturation,hue]')
 
     parser.add_argument('--idx', default=0, type=int, help='the index for the repeated experiment')
+
+    #parameters for gaussian data
+    parser.add_argument('--gauss_dimension',  type=int, default=100)
+    parser.add_argument('--gauss_train_samples',  type=int, default=50000)
+    parser.add_argument('--gauss_test_samples',  type=int, default=10000)
+    parser.add_argument('--gauss_scale', default=10.0, type=float) 
 
     args = parser.parse_args()
 
     print('\nLearning Rate: %f' % args.lr)
-    print('\nDecay Rate: %f' % args.lr_decay)
 
     use_cuda = torch.cuda.is_available()
     if use_cuda:
@@ -457,10 +457,11 @@ if __name__ == '__main__':
 
     f = open('trained_nets/' + save_folder + '/log.out', 'a')
 
-    if not sum(args.synthetic_gaussian):
-        trainloader, testloader, trainset = get_data_loaders(args)
+    if args.dataset == 'gauss':
+        trainloader, testloader = get_synthetic_gaussian_data_loaders(args)
     else:
-        trainloader, testloader, trainset = get_synthetic_gaussian_data_loaders(args)
+        trainloader, testloader, _ = get_data_loaders(args)
+        
 
     if args.label_corrupt_prob and not args.resume_model:
         torch.save(trainloader, 'trained_nets/' + save_folder + '/trainloader.dat')
@@ -516,8 +517,8 @@ if __name__ == '__main__':
         opt_state = {
             'optimizer': optimizer.state_dict()
         }
-        torch.save(state, 'trained_nets/' + save_folder + '/model_0.t7')
-        torch.save(opt_state, 'trained_nets/' + save_folder + '/opt_state_0.t7')
+        #torch.save(state, 'trained_nets/' + save_folder + '/model_0.t7')
+        #torch.save(opt_state, 'trained_nets/' + save_folder + '/opt_state_0.t7')
 
     # training logs per iteration
     training_history = []
@@ -558,16 +559,16 @@ if __name__ == '__main__':
         gradient_noise_norm_history.append(gradient_noise_norm.numpy())
 
         # save state for landscape on every epoch
-        state = {
-            'acc': acc,
-            'epoch': epoch,
-            'state_dict': net.module.state_dict() if args.ngpu > 1 else net.state_dict(),
-        }
-        opt_state = {
-            'optimizer': optimizer.state_dict()
-        }
-        torch.save(state, 'trained_nets/' + save_folder + '/model_' + str(epoch) + '.t7')
-        torch.save(opt_state, 'trained_nets/' + save_folder + '/opt_state_' + str(epoch) + '.t7')
+        # state = {
+        #     'acc': acc,
+        #     'epoch': epoch,
+        #     'state_dict': net.module.state_dict() if args.ngpu > 1 else net.state_dict(),
+        # }
+        # opt_state = {
+        #     'optimizer': optimizer.state_dict()
+        # }
+        # torch.save(state, 'trained_nets/' + save_folder + '/model_' + str(epoch) + '.t7')
+        # torch.save(opt_state, 'trained_nets/' + save_folder + '/opt_state_' + str(epoch) + '.t7')
 
    
     f.close()
