@@ -70,9 +70,9 @@ def get_data_loaders(args):
 
 def get_synthetic_gaussian_data_loaders(args):
     num_classes = 10
-    dim_data = args.gauss_dimension 
-    num_train_samples = args.gauss_train_samples
-    num_test_samples  = args.gauss_test_samples        
+    dim_data = 3*32*32 # make it same to CIFA10
+    num_train_samples = 50000
+    num_test_samples  = 10000        
     scale = args.gauss_scale
     means = np.random.multivariate_normal(np.zeros(dim_data), np.identity(dim_data), size=num_classes)         
     means = scale * means / np.linalg.norm(means, ord=2, keepdims=True, axis=1)
@@ -89,7 +89,7 @@ def get_synthetic_gaussian_data_loaders(args):
     for mean in means: 
          samples = np.random.multivariate_normal(mean, sigma * np.identity(dim_data), size=num_train_samples // num_classes)
          for sample in samples:  
-             train_data.append([sample, class_num])
+             train_data.append([np.reshape(sample,(3,32,32)), class_num])
          class_num += 1         
 
     test_data = []
@@ -97,7 +97,7 @@ def get_synthetic_gaussian_data_loaders(args):
     for mean in means:
         samples = np.random.multivariate_normal(mean, sigma * np.identity(dim_data), size=num_test_samples // num_classes)
         for sample in samples:
-             test_data.append([sample, class_num])  
+             test_data.append([np.reshape(sample,(3,32,32)), class_num])  
         class_num += 1
 
      # get tr_loader for train/eval and te_loader for eval
@@ -109,7 +109,7 @@ def get_synthetic_gaussian_data_loaders(args):
         )
 
     test_loader = torch.utils.data.DataLoader(
-        dataset=train_data,
+        dataset=test_data,
         batch_size=args.batch_size,
         shuffle=False
         #sampler=torch.utils.data.SubsetRandomSampler(np.arange(args.subset))

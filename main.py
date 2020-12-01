@@ -423,9 +423,6 @@ if __name__ == '__main__':
     parser.add_argument('--idx', default=0, type=int, help='the index for the repeated experiment')
 
     #parameters for gaussian data
-    parser.add_argument('--gauss_dimension',  type=int, default=100)
-    parser.add_argument('--gauss_train_samples',  type=int, default=50000)
-    parser.add_argument('--gauss_test_samples',  type=int, default=10000)
     parser.add_argument('--gauss_scale', default=10.0, type=float) 
 
     args = parser.parse_args()
