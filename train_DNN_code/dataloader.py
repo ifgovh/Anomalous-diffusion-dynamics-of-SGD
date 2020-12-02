@@ -57,7 +57,6 @@ def get_data_loaders(args):
                                                 transform=transforms.Compose([transforms.ToTensor(),transforms.Normalize((0.1307,),(0.3081,))]))
         testset = torchvision.datasets.MNIST(root='./data', train=False, download=True,
                                                transform=transforms.Compose([transforms.ToTensor(),transforms.Normalize((0.1307,),(0.3081,))]))
-
     trainloader = torch.utils.data.DataLoader(trainset, batch_size=args.batch_size,
                                               shuffle=True, **kwargs)
     testloader = torch.utils.data.DataLoader(testset, batch_size=args.batch_size,
