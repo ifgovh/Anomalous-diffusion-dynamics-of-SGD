@@ -47,7 +47,7 @@ def get_data_loaders(args):
     ])
 
 
-    kwargs = {'num_workers': 2, 'pin_memory': True} if args.ngpu else {}
+    kwargs = {'num_workers': 1, 'pin_memory': True} if args.ngpu else {}
     if args.dataset == 'cifar10':
         trainset = torchvision.datasets.CIFAR10(root='./data', train=True, download=True,
                                                 transform=transform_train)
@@ -71,8 +71,8 @@ def get_data_loaders(args):
 def get_synthetic_gaussian_data_loaders(args):
     num_classes = 10
     dim_data = 3*32*32 # make it same to CIFA10
-    num_train_samples = 50000
-    num_test_samples  = 10000        
+    num_train_samples = 5000
+    num_test_samples  = 1000        
     scale = args.gauss_scale
     means = np.random.multivariate_normal(np.zeros(dim_data), np.identity(dim_data), size=num_classes)         
     means = scale * means / np.linalg.norm(means, ord=2, keepdims=True, axis=1)
