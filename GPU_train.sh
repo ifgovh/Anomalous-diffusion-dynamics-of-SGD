@@ -6,7 +6,7 @@
 #PBS -l walltime=150:50:59
 #PBS -e PBSout/
 #PBS -o PBSout/
-#PBS -J 1-8
+#PBS -J 1-2
 
 cd ~
 source tf/bin/activate

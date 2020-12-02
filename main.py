@@ -57,8 +57,6 @@ def train_save(trainloader, net, criterion, optimizer, use_cuda=True):
         for batch_idx, (inputs, targets) in enumerate(trainloader):
             batch_size = inputs.size(0)
             total += batch_size
-            aa=inputs.numpy()
-            plt.imshow(aa[1,1,:]);plt.show()
             if use_cuda:
                 inputs, targets = inputs.cuda(), targets.cuda()
             optimizer.zero_grad()

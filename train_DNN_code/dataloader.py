@@ -46,7 +46,6 @@ def get_data_loaders(args):
         normalize,
     ])
 
-
     kwargs = {'num_workers': 1, 'pin_memory': True} if args.ngpu else {}
     if args.dataset == 'cifar10':
         trainset = torchvision.datasets.CIFAR10(root='./data', train=True, download=True,
@@ -55,16 +54,14 @@ def get_data_loaders(args):
                                                transform=transform_test)
     elif args.dataset == 'mnist':
         trainset = torchvision.datasets.MNIST(root='./data', train=True, download=True,
-                                                transform=transform_train)
+                                                transform=transforms.Compose([transforms.ToTensor(),transforms.Normalize((0.1307,),(0.3081,))]))
         testset = torchvision.datasets.MNIST(root='./data', train=False, download=True,
-                                               transform=transform_test)
-
+                                               transform=transforms.Compose([transforms.ToTensor(),transforms.Normalize((0.1307,),(0.3081,))]))
 
     trainloader = torch.utils.data.DataLoader(trainset, batch_size=args.batch_size,
                                               shuffle=True, **kwargs)
     testloader = torch.utils.data.DataLoader(testset, batch_size=args.batch_size,
-                                             shuffle=False, **kwargs)
-
+                                              shuffle=True, **kwargs)
     return trainloader, testloader, trainset
 
 

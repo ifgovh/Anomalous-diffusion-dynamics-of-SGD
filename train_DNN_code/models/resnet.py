@@ -126,8 +126,8 @@ class MnistBlock(nn.Module):
     
     def __init__(self, in_size:int, hidden_size:int, out_size:int, pad:int):
         super().__init__()
-        self.conv1 = conv(in_size, hidden_size, pad)
-        self.conv2 = conv(hidden_size, out_size, pad)
+        self.conv1 = nn.Conv2d(in_size, hidden_size, kernel_size=3, stride=2, padding=pad) 
+        self.conv2 = nn.Conv2d(hidden_size, out_size, kernel_size=3, stride=2, padding=pad) 
         self.batchnorm1 = nn.BatchNorm2d(hidden_size)
         self.batchnorm2 = nn.BatchNorm2d(out_size)
     
@@ -201,22 +201,25 @@ class ResNet_cifar(nn.Module):
         out = self.linear(out)
         return out
 
-class ResNet_mnist(nn.Module):
+class ResNet_Mnist(nn.Module):
     
     def __init__(self, n_classes=10):
         super().__init__()
         self.res1 = MnistBlock(1, 8, 16, 15)
         self.res2 = MnistBlock(16, 32, 16, 15)
-        self.conv = conv(16, n_classes)
+        self.conv = nn.Conv2d(16, n_classes, kernel_size=3, stride=2, padding=1)
         self.batchnorm = nn.BatchNorm2d(n_classes)
         self.maxpool = nn.AdaptiveMaxPool2d(1)
         
     def forward(self, x):
-        x = preprocess(x)
+        #import pdb;pdb.set_trace()
+        x = self.preprocess(x)
         x = self.res1(x)
         x = self.res2(x) 
         x = self.maxpool(self.batchnorm(self.conv(x)))
         return x.view(x.size(0), -1)
+    def preprocess(self,x):
+        return x.view(-1, 1, 28, 28)
 
 class WResNet_cifar(nn.Module):
     def __init__(self, block, num_blocks, k, num_classes=10):
@@ -426,6 +429,5 @@ def ResNet14_noshort_nobatchnorm():
 
 # for mnist
 def ResNet_mnist():
-
-    return ResNet_mnist()
+    return ResNet_Mnist()
 
