@@ -73,7 +73,7 @@ def get_synthetic_gaussian_data_loaders(args):
     scale = args.gauss_scale
     means = np.random.multivariate_normal(np.zeros(dim_data), np.identity(dim_data), size=num_classes)         
     means = scale * means / np.linalg.norm(means, ord=2, keepdims=True, axis=1)
-
+    import pdb; pdb.set_trace()
     min_distance = 100.0
     for i in range(num_classes):
         for j in range(1+i, num_classes):
