@@ -122,6 +122,21 @@ class Bottleneck_noshortcut(nn.Module):
         out = self.bn3(self.conv3(out))
         return out
 
+class MnistBlock(nn.Module):
+    
+    def __init__(self, in_size:int, hidden_size:int, out_size:int, pad:int):
+        super().__init__()
+        self.conv1 = conv(in_size, hidden_size, pad)
+        self.conv2 = conv(hidden_size, out_size, pad)
+        self.batchnorm1 = nn.BatchNorm2d(hidden_size)
+        self.batchnorm2 = nn.BatchNorm2d(out_size)
+    
+    def convblock(self, x):
+        x = F.relu(self.batchnorm1(self.conv1(x)))
+        x = F.relu(self.batchnorm2(self.conv2(x)))
+        return x
+    
+    def forward(self, x): return x + self.convblock(x) # skip connection
 
 class ResNet(nn.Module):
     def __init__(self, block, num_blocks, num_classes=10):
@@ -187,34 +202,21 @@ class ResNet_cifar(nn.Module):
         return out
 
 class ResNet_mnist(nn.Module):
-    def __init__(self, block, num_blocks, num_classes=10):
-        super(ResNet_mnist, self).__init__()
-        self.in_planes = 8
-
-        self.conv1  = nn.Conv2d(1, 16, kernel_size=3, stride=1, padding=1, bias=False)
-        self.bn1    = nn.BatchNorm2d(16)
-        self.layer1 = self._make_layer(block, 4, num_blocks[0], stride=1)
-        self.layer2 = self._make_layer(block, 8, num_blocks[1], stride=2)
-        self.layer3 = self._make_layer(block, 16, num_blocks[2], stride=2)
-        self.linear = nn.Linear(64*block.expansion, num_classes)
-
-    def _make_layer(self, block, planes, num_blocks, stride):
-        strides = [stride] + [1]*(num_blocks-1)
-        layers = []
-        for stride in strides:
-            layers.append(block(self.in_planes, planes, stride))
-            self.in_planes = planes * block.expansion
-        return nn.Sequential(*layers)
-
+    
+    def __init__(self, n_classes=10):
+        super().__init__()
+        self.res1 = MnistBlock(1, 8, 16, 15)
+        self.res2 = MnistBlock(16, 32, 16, 15)
+        self.conv = conv(16, n_classes)
+        self.batchnorm = nn.BatchNorm2d(n_classes)
+        self.maxpool = nn.AdaptiveMaxPool2d(1)
+        
     def forward(self, x):
-        out = F.relu(self.bn1(self.conv1(x)))
-        out = self.layer1(out)
-        out = self.layer2(out)
-        out = self.layer3(out)
-        out = F.avg_pool2d(out, 8)
-        out = out.view(out.size(0), -1)
-        out = self.linear(out)
-        return out
+        x = preprocess(x)
+        x = self.res1(x)
+        x = self.res2(x) 
+        x = self.maxpool(self.batchnorm(self.conv(x)))
+        return x.view(x.size(0), -1)
 
 class WResNet_cifar(nn.Module):
     def __init__(self, block, num_blocks, k, num_classes=10):
@@ -423,8 +425,7 @@ def ResNet14_noshort_nobatchnorm():
     return ResNet_cifar(BasicBlock_noshortcut_nobatchnorm, [n,n,n])
 
 # for mnist
-def ResNet14_mnist():
-    depth = 14
-    n = (depth - 2) // 6
-    return ResNet_mnist(BasicBlock, [n,n,n])
+def ResNet_mnist():
+
+    return ResNet_mnist()
 

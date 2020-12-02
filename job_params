@@ -1,7 +1,4 @@
-resnet14 0.1 500 1024 cifar10 resnet14_noshort 0.1 500 1024 cifar10 resnet20 0.1 500 1024 cifar10 resnet20_noshort 0.1 500 1024 cifar10 resnet56 0.1 500 1024 cifar10 resnet56_noshort 0.1 500 1024 cifar10 resnet14 0.001 500 128 cifar10 resnet14 0.01 500 128 cifar10
-resnet14 0.05 500 128 cifar10 resnet14 0.1 500 128 cifar10 resnet14 0.15 500 128 cifar10 resnet14 0.3 500 128 cifar10 resnet14 0.5 500 128 cifar10 resnet14 1 500 128 cifar10 resnet14 0.001 500 1024 cifar10 resnet14_mnist 0.1 500 1024 mnist
-resnet14 0.1 5000 1024 cifar10 resnet14 0.1 10000 1024 cifar10 resnet14 0.1 500 1024 gauss
-resnet14_nobatchnorm 0.1 500 1024 cifar10 resnet14_noshort_nobatchnorm 0.1 500 1024 cifar10 resnet110 0.1 500 1024 cifar10 resnet110_noshort 0.1 500 1024 cifar10
-
-
-
+resnet14 0.1 500 1024 'cifar10' resnet14_noshort 0.1 500 1024 'cifar10' resnet20 0.1 500 1024 'cifar10' resnet20_noshort 0.1 500 1024 'cifar10' resnet56 0.1 500 1024 'cifar10' resnet56_noshort 0.1 500 1024 'cifar10' resnet14 0.001 500 128 'cifar10' resnet14 0.01 500 128 'cifar10'
+resnet14 0.05 500 128 'cifar10' resnet14 0.1 500 128 'cifar10' resnet14 0.15 500 128 'cifar10' resnet14 0.3 500 128 'cifar10' resnet14 0.5 500 128 'cifar10' resnet14 1 500 128 'cifar10' resnet14 0.001 500 1024 'cifar10' resnet_mnist 0.1 500 1024 'mnist'
+resnet14 0.1 500 1024 'gauss' resnet14 0.1 5000 1024 'cifar10' resnet14 0.1 10000 1024 'cifar10'
+resnet14_nobatchnorm 0.1 500 1024 'cifar10' resnet14_noshort_nobatchnorm 0.1 500 1024 'cifar10' resnet110 0.1 500 1024 'cifar10' resnet110_noshort 0.1 500 1024 'cifar10'
