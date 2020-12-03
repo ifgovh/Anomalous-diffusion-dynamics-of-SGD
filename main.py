@@ -518,11 +518,7 @@ if __name__ == '__main__':
     # training logs per iteration
     training_history = []
     testing_history = []
-    # gradient container
-    grads_history = []
-    estimated_full_batch_grad_history = []
-    gradient_noise_norm_history = []
-
+   
     for epoch in range(start_epoch, args.epochs + 1):
         print(epoch)        
         # Save checkpoint.
@@ -533,7 +529,9 @@ if __name__ == '__main__':
 
             # save loss and weights in each tiny step in every epoch
             sio.savemat('trained_nets/' + save_folder + '/model_' + str(epoch) + '_sub_loss_w.mat',
-                                mdict={'sub_weights': sub_weights,'sub_loss': sub_loss, 'test_sub_loss': test_sub_loss},
+                                mdict={'sub_weights': sub_weights,'sub_loss': sub_loss, 'test_sub_loss': test_sub_loss,
+                                'grads_history': grads_history, 'estimated_full_batch_grad': estimated_full_batch_grad,
+                                'gradient_noise_norm': gradient_noise_norm},
                                 )            
         else:
             loss, train_err, grads, estimated_full_batch_grad, gradient_noise_norm = train(trainloader, net, criterion, optimizer, use_cuda)
@@ -549,9 +547,7 @@ if __name__ == '__main__':
         # record training history (starts at initial point)
         training_history.append([loss, 100 - train_err])
         testing_history.append([test_loss, acc])
-        grads_history.append(grads.numpy())
-        estimated_full_batch_grad_history.append(estimated_full_batch_grad.numpy())
-        gradient_noise_norm_history.append(gradient_noise_norm.numpy())
+
 
         # save state for landscape on every epoch
         # state = {
@@ -568,10 +564,8 @@ if __name__ == '__main__':
    
     f.close()
  
-    sio.savemat('trained_nets/' + save_folder + '/' + args.model + '_gradient_log.mat',
-                        mdict={'training_history': training_history,'testing_history': testing_history,'grads_history':grads_history, 
-                        'estimated_full_batch_grad_history':estimated_full_batch_grad_history,
-                        'gradient_noise_norm_history':gradient_noise_norm_history},
+    sio.savemat('trained_nets/' + save_folder + '/' + args.model + '_loss_log.mat',
+                        mdict={'training_history': training_history,'testing_history': testing_history},
                         )
 
     #--------------------------------------------------------------------------
