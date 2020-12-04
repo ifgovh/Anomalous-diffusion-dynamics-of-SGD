@@ -3,12 +3,40 @@ import numpy as np
 import torch
 import torchvision
 import torchvision.transforms as transforms
+from torchvision.datasets.vision import VisionDataset
 
-import numbers
-import random
 from typing import Tuple, List
 
 from torchvision.transforms import functional as F
+
+import argparse
+
+class SyntheticGaussianDataset(VisionDataset):
+
+    def __init__(self, data_num):
+        self.data = torch.rand(data_num,3,32,32)
+        self.data = self.data / torch.max(self.data)
+        self.targets = torch.randint(low=0, high=9, size=(data_num,1))
+
+    def __getitem__(self, index: int):
+        """
+        Args:
+            index (int): Index
+
+        Returns:
+            tuple: (image, target) where target is index of the target class.
+        """
+        img, target = self.data[index], self.targets[index]
+
+        
+        img = transforms.functional.normalize(img,(0.1307,),(0.3081,))
+       
+        return img, target
+
+
+    def __len__(self) -> int:
+        return len(self.data)
+
 
 def get_data_loaders(args):
     if args.trainloader and args.testloader:
@@ -65,31 +93,20 @@ def get_data_loaders(args):
 
 
 def get_synthetic_gaussian_data_loaders(args):
-    num_classes = 10
-    num_train_samples = 50000
-    num_test_samples  = 1000   
-
-    train_data = []
-    for _ in range(num_train_samples):
-        for class_i in range(1,num_classes+1):
-            train_data.append([class_i * torch.rand(3,32,32), class_i])
-
-    test_data = []
-    for _ in range(num_test_samples):
-        for class_i in range(1,num_classes+1):
-            test_data.append([class_i * torch.rand(3,32,32), class_i])
+    trainset = SyntheticGaussianDataset(data_num=50000)
+    testset = SyntheticGaussianDataset(data_num=1000)
 
 
      # get tr_loader for train/eval and te_loader for eval
     train_loader = torch.utils.data.DataLoader(
-        dataset=train_data,
+        dataset=trainset,
         batch_size=args.batch_size,
         shuffle=False
         #sampler=torch.utils.data.SubsetRandomSampler(np.arange(args.subset))
         )
 
     test_loader = torch.utils.data.DataLoader(
-        dataset=test_data,
+        dataset=testset,
         batch_size=args.batch_size,
         shuffle=False
         #sampler=torch.utils.data.SubsetRandomSampler(np.arange(args.subset))
@@ -98,3 +115,19 @@ def get_synthetic_gaussian_data_loaders(args):
 
     return train_loader, test_loader
    
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description='PyTorch CIFAR10 Training')
+    parser.add_argument('--dataset', default='gauss', type=str, help='mnist | cifar10 | gauss')
+    parser.add_argument('--batch_size', default=128, type=int)
+    parser.add_argument('--ngpu', default=0, type=int)
+    parser.add_argument('--raw_data', default=1, type=int)
+
+    args = parser.parse_args()
+
+    train_loader, test_loader = get_synthetic_gaussian_data_loaders(args)
+
+    for i, (x,y) in enumerate(train_loader):
+        print(x.size())
+
+    for i, (x,y) in enumerate(test_loader):
+        print(x.size())
