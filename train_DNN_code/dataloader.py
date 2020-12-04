@@ -9,8 +9,6 @@ from typing import Tuple, List
 
 from torchvision.transforms import functional as F
 
-import argparse
-
 class SyntheticGaussianDataset(VisionDataset):
 
     def __init__(self, data_num):
@@ -29,7 +27,7 @@ class SyntheticGaussianDataset(VisionDataset):
         img, target = self.data[index], self.targets[index]
 
         
-        img = transforms.functional.normalize(img,(0.1307,),(0.3081,))
+        img = F.normalize(img,(0.1307,),(0.3081,))
        
         return img, target
 
@@ -114,20 +112,3 @@ def get_synthetic_gaussian_data_loaders(args):
    
 
     return train_loader, test_loader
-   
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='PyTorch CIFAR10 Training')
-    parser.add_argument('--dataset', default='gauss', type=str, help='mnist | cifar10 | gauss')
-    parser.add_argument('--batch_size', default=128, type=int)
-    parser.add_argument('--ngpu', default=0, type=int)
-    parser.add_argument('--raw_data', default=1, type=int)
-
-    args = parser.parse_args()
-
-    train_loader, test_loader = get_synthetic_gaussian_data_loaders(args)
-
-    for i, (x,y) in enumerate(train_loader):
-        print(x.size())
-
-    for i, (x,y) in enumerate(test_loader):
-        print(x.size())
