@@ -530,8 +530,8 @@ if __name__ == '__main__':
             # save loss and weights in each tiny step in every epoch
             sio.savemat('trained_nets/' + save_folder + '/model_' + str(epoch) + '_sub_loss_w.mat',
                                 mdict={'sub_weights': sub_weights,'sub_loss': sub_loss, 'test_sub_loss': test_sub_loss,
-                                'grads': grads, 'estimated_full_batch_grad': estimated_full_batch_grad,
-                                'gradient_noise_norm': gradient_noise_norm},
+                                'grads': grads.numpy(), 'estimated_full_batch_grad': estimated_full_batch_grad.numpy(),
+                                'gradient_noise_norm': gradient_noise_norm.numpy()},
                                 )            
         else:
             loss, train_err, grads, estimated_full_batch_grad, gradient_noise_norm = train(trainloader, net, criterion, optimizer, use_cuda)
