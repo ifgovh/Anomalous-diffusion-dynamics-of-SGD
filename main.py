@@ -530,7 +530,7 @@ if __name__ == '__main__':
             # save loss and weights in each tiny step in every epoch
             sio.savemat('trained_nets/' + save_folder + '/model_' + str(epoch) + '_sub_loss_w.mat',
                                 mdict={'sub_weights': sub_weights,'sub_loss': sub_loss, 'test_sub_loss': test_sub_loss,
-                                'grads_history': grads_history, 'estimated_full_batch_grad': estimated_full_batch_grad,
+                                'grads': grads, 'estimated_full_batch_grad': estimated_full_batch_grad,
                                 'gradient_noise_norm': gradient_noise_norm},
                                 )            
         else:

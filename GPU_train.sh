@@ -6,12 +6,12 @@
 #PBS -l walltime=150:50:59
 #PBS -e PBSout/
 #PBS -o PBSout/
-#PBS -J 1-4
+##PBS -J 1-1
 
 cd ~
 source tf/bin/activate
 cd "$PBS_O_WORKDIR"
-
+PBS_ARRAY_INDEX=1
 params=`sed "${PBS_ARRAY_INDEX}q;d" job_params`
 param_array=( $params )
 
