@@ -19,7 +19,9 @@ for ii = 1:length(d)
     part_num = 1;
     index = 1;
     for file = 1:length(sub_loss_w_dir)
+        try
         R = load(fullfile(d(ii).folder,d(ii).name,sprintf('model_%d_sub_loss_w.mat',file)));
+        eval(['delete ',fullfile(d(ii).folder,d(ii).name,sprintf('model_%d_sub_loss_w.mat',file))])
         % organise the weights
         all_weights_tmp = cellfun(@(x) reshape(x,1,[]) ,R.sub_weights,'UniformOutput',false);
         all_sub_weights{index} = cell2mat(all_weights_tmp);
@@ -37,6 +39,9 @@ for ii = 1:length(d)
             index = 1; % start again
         end
         index = index + 1;
+        catch
+            index = 1;
+        end
     end    
 end
 end
@@ -66,7 +71,7 @@ fprintf('Calculating MSD part: %d',part_num)
 % calculate MSD
 [MSD,Mean_contourlength,tau,MSD_forcontour,MSL_contourlength,contour_length,MSL_distance,distance,Displacement_all,Contour_length_all] = get_contour_lenth_MSD_loss(MSD_feed);
 [MSD_noaverage,tau_noaverage] = get_no_average_MSD(MSD_feed(:,1:end-1));
-clear MSD_feed
+
 MSD = gather(MSD);
 Mean_contourlength = gather(Mean_contourlength);
 tau = gather(tau);
@@ -79,21 +84,10 @@ Displacement_all = gather(Displacement_all);
 Contour_length_all = gather(Contour_length_all);
 disp('MSD and contour: done!')
 
-% loss dynamics
-loss = cell2mat(all_sub_loss);
-loss = reshape(loss',[],1);
-% get the step difference of training loss
-delta_train_loss = diff(loss);
-
-% fit gradient distribution
-F_grads = fitdist(double(grads(randperm(numel(grads),5000))),'stable');
-F_full_batch_grad = fitdist(double(estimated_full_batch_grad(randperm(numel(estimated_full_batch_grad),5000))),'stable');
-F_gradient_noise_norm = fitdist(double(gradient_noise_norm(randperm(numel(gradient_noise_norm),5000))),'stable');
-    
 % transversed excursion, randomly get 100 fragments
-[end_end_dis2,transversed_excursion] = zeros(100,1);
-fragment_length = 50;
-for rd = 1:100
+[end_end_dis2,transversed_excursion] = deal(zeros(50,1));
+fragment_length = 100;
+for rd = 1:50
     fragment_start = randperm(size(MSD_feed,1) - fragment_length,1);
     fragment_end = fragment_start + fragment_length;
     temp_tran_excu = zeros(fragment_length,1);
@@ -107,13 +101,32 @@ for rd = 1:100
     transversed_excursion(rd) = max(temp_tran_excu)^2;
 end
 
+clear MSD_feed
+
+% loss dynamics
+loss = cell2mat(all_sub_loss);
+loss = reshape(loss',[],1);
+% get the step difference of training loss
+delta_train_loss = diff(loss);
+
+% fit gradient distribution
+Grads = cell2mat(grads);
+F_grads = fitdist(double(Grads(randperm(numel(Grads),5000)))','stable');
+Full_grads = cell2mat(estimated_full_batch_grad);
+F_full_batch_grad = fitdist(double(Full_grads(randperm(numel(Full_grads),5000)))','stable');
+G_noise_norm = cell2mat(gradient_noise_norm);
+F_gradient_noise_norm = fitdist(double(G_noise_norm(randperm(numel(G_noise_norm),1000)))','stable');
+    
+
 %save
 add_source = split(GN_dir(1).folder,'/');
 add_source{3} = 'cortical';
 add_new = join(add_source,'/');
-save(fullfile(add_new{1},[d.name(1:end-24),'_data_part_',num2str(part_num),'22.mat']),'loss','delta_train_loss',...
+eval(['mkdir ',add_new{1}])
+save(fullfile(add_new{1},[d.name(1:end-24),'_data_part_',num2str(part_num),'.mat']),'loss','delta_train_loss',...
     'MSD','Mean_contourlength','tau','MSD_forcontour','MSL_contourlength','contour_length','MSL_distance',...
     'distance','Displacement_all','Contour_length_all','MSD_noaverage','tau_noaverage',...
-    'F_grads','F_full_batch_grad','F_gradient_noise_norm','end_end_dis2','transversed_excursion','-v7.3')
+    'F_grads','F_full_batch_grad','F_gradient_noise_norm','Grads','Full_grads','G_noise_norm',...
+    'end_end_dis2','transversed_excursion','-v7.3')
 end
 
