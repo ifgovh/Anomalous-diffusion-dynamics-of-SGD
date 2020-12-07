@@ -3,18 +3,17 @@ import numpy as np
 import torch
 import torchvision
 import torchvision.transforms as transforms
-from torchvision.datasets.vision import VisionDataset
 
 from typing import Tuple, List
 
 from torchvision.transforms import functional as F
 
-class SyntheticGaussianDataset(VisionDataset):
+class SyntheticGaussianDataset(torchvision.datasets.CIFAR10):
 
     def __init__(self, data_num):
         self.data = torch.rand(data_num,3,32,32)
         self.data = self.data / torch.max(self.data)
-        self.targets = torch.randint(low=0, high=9, size=(data_num,1))
+        self.targets = torch.randint(low=0, high=9, size=(data_num,))
 
     def __getitem__(self, index: int):
         """
@@ -34,7 +33,6 @@ class SyntheticGaussianDataset(VisionDataset):
 
     def __len__(self) -> int:
         return len(self.data)
-
 
 def get_data_loaders(args):
     if args.trainloader and args.testloader:
