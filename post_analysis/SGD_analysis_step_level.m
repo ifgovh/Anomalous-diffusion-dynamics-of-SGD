@@ -6,8 +6,7 @@ steps_in_part = 1e3;
 % Loop number for PBS array job
 loop_num = 0;
 
-for ii = 1:length(d)
-    sub_loss_w_dir = dir(fullfile(d(ii).folder,d(ii).name,'model*sub_loss_w.mat'));
+for ii = 1:length(d)    
     % For PBS array job
     loop_num = loop_num + 1;
     if nargin ~= 0
@@ -16,6 +15,7 @@ for ii = 1:length(d)
             continue;
         end
     end
+    sub_loss_w_dir = dir(fullfile(d(ii).folder,d(ii).name,'model*sub_loss_w.mat'));
     part_num = 1;
     index = 1;
     for file = 1:length(sub_loss_w_dir)
@@ -119,11 +119,11 @@ F_gradient_noise_norm = fitdist(double(G_noise_norm(randperm(numel(G_noise_norm)
     
 
 %save
-add_source = split(GN_dir(1).folder,'/');
-add_source{3} = 'cortical';
-add_new = join(add_source,'/');
-eval(['mkdir ',add_new{1}])
-save(fullfile(add_new{1},[d.name(1:end-24),'_data_part_',num2str(part_num),'.mat']),'loss','delta_train_loss',...
+%add_source = split(GN_dir(1).folder,'/');
+%add_source{3} = 'cortical';
+%add_new = join(add_source,'/');
+%eval(['mkdir ',add_new{1}])
+save(fullfile(GN_dir(1).folder,[d.name(1:end-24),'_data_part_',num2str(part_num),'.mat']),'loss','delta_train_loss',...
     'MSD','Mean_contourlength','tau','MSD_forcontour','MSL_contourlength','contour_length','MSL_distance',...
     'distance','Displacement_all','Contour_length_all','MSD_noaverage','tau_noaverage',...
     'F_grads','F_full_batch_grad','F_gradient_noise_norm','Grads','Full_grads','G_noise_norm',...
