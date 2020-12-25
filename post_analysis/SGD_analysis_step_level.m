@@ -110,10 +110,13 @@ loss = reshape(loss',[],1);
 delta_train_loss = diff(loss);
 
 % fit gradient distribution
+% minibatch gradient
 Grads = cell2mat(grads);
 F_grads = fitdist(double(Grads(randperm(numel(Grads),5000)))','stable');
+% estimated full batch gradient
 Full_grads = cell2mat(estimated_full_batch_grad);
 F_full_batch_grad = fitdist(double(Full_grads(randperm(numel(Full_grads),5000)))','stable');
+% norm of minibatch gradient
 G_noise_norm = cell2mat(gradient_noise_norm);
 F_gradient_noise_norm = fitdist(double(G_noise_norm(randperm(numel(G_noise_norm),1000)))','stable');
     
