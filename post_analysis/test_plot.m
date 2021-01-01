@@ -1,8 +1,10 @@
 clear
 close all
 %% load data
-d = dir('trained_nets/resnet*');
-ii = 2;
+d = dir('/project/RDS-FSC-cortical-RW/Anomalous-diffusion-dynamics-of-SGD/trained_nets/resnet*');
+for ii = 4:6
+    clearvars -except d ii
+    close all
 
 datax_dir = dir(fullfile(d(ii).folder,d(ii).name,'*data_part*'));
 
@@ -62,14 +64,14 @@ figure('NumberTitle','off','name', 'Reproduction', 'units', 'centimeters', ...
 subaxis(total_row,total_column,1,1,'SpacingHoriz',SH,...
     'SpacingVert',SV,'MR',MR,'ML',ML,'MT',MT,'MB',MB);
 hold on
-select_num = 24;
+select_num = length(MSD);
 map = [0,90,171;71,31,31;255,66,93]./255;
 kkk=1;
 for k = [1,round(select_num/5),select_num]
     loglog(tau{k},MSD{k},'color',map(kkk,:),'linewidth',linewidth)
     kkk=kkk+1;
 end
-axis([1,1e3,1e-2,1e2])
+% axis([1,1e3,1e-2,1e2])
 legend({'t_w=1 step','t_w=5001','t_w=24000'})
 legend boxoff
 xlabel('\tau (step)')
@@ -82,14 +84,14 @@ set(gca,'linewidth',linewidth,'fontsize',fontsize,'tickdir','out','xscale','log'
 subaxis(total_row,total_column,2,1,'SpacingHoriz',SH,...
     'SpacingVert',SV,'MR',MR,'ML',ML,'MT',MT,'MB',MB);
 hold on
-select_num = 24;
+select_num = length(MSD);
 map = [0,90,171;71,31,31;255,66,93]./255;
 kkk=1;
 for k = [1,round(select_num/5),select_num]
     loglog(tau_noaverage{k},MSD_noaverage{k},'color',map(kkk,:),'linewidth',linewidth)
     kkk=kkk+1;
 end
-axis([1,1e3,1e-2,1e2])
+% axis([1,1e3,1e-2,1e2])
 legend({'t_w=1 step','t_w=5001','t_w=24000'})
 legend boxoff
 xlabel('\tau no average (step)')
@@ -102,13 +104,13 @@ set(gca,'linewidth',linewidth,'fontsize',fontsize,'tickdir','out','xscale','log'
 subaxis(total_row,total_column,3,1,'SpacingHoriz',SH,...
     'SpacingVert',SV,'MR',MR,'ML',ML,'MT',MT,'MB',MB);
 hold on
-select_num = 24;
+select_num = length(MSD);
 map = [0,90,171;71,31,31;255,66,93]./255;
 kkk = 1;
 for k = [1,round(select_num/5),select_num]
 [N,edges] = histcounts(Grads{k},651,'normalization','pdf');
-plot(edges(2:end),N,'color',map(kkk,:),'o')
-plot(linspace(-0.05,0.05,5000),pdf(F_grads,linspace(-0.05,0.05,5000))*factor,'color',map(kkk,:));
+plot(edges(2:end),N,'color',map(kkk,:),'marker','o')
+plot(linspace(-0.05,0.05,5000),pdf(F_grads{k},linspace(-0.05,0.05,5000)),'color',map(kkk,:));
 kkk = kkk + 1;
 end
 legend({'t_w=1 step','t_w=5001','t_w=24000'})
@@ -123,13 +125,13 @@ set(gca,'linewidth',linewidth,'fontsize',fontsize,'tickdir','out','TickLength',[
 subaxis(total_row,total_column,1,2,'SpacingHoriz',SH,...
     'SpacingVert',SV,'MR',MR,'ML',ML,'MT',MT,'MB',MB);
 hold on
-select_num = 24;
+select_num = length(MSD);
 map = [0,90,171;71,31,31;255,66,93]./255;
 kkk = 1;
 for k = [1,round(select_num/5),select_num]
 [N,edges] = histcounts(Full_grads{k},651,'normalization','pdf');
-plot(edges(2:end),N,'color',map(kkk,:),'o')
-plot(linspace(-0.05,0.05,5000),pdf(F_full_batch_grad,linspace(-0.05,0.05,5000))*factor,'color',map(kkk,:));
+plot(edges(2:end),N,'color',map(kkk,:),'marker','o')
+plot(linspace(-0.05,0.05,5000),pdf(F_full_batch_grad{k},linspace(-0.05,0.05,5000)),'color',map(kkk,:));
 kkk = kkk + 1;
 end
 legend({'t_w=1 step','t_w=5001','t_w=24000'})
@@ -144,13 +146,13 @@ set(gca,'linewidth',linewidth,'fontsize',fontsize,'tickdir','out','TickLength',[
 subaxis(total_row,total_column,2,2,'SpacingHoriz',SH,...
     'SpacingVert',SV,'MR',MR,'ML',ML,'MT',MT,'MB',MB);
 hold on
-select_num = 24;
+select_num = length(MSD);
 map = [0,90,171;71,31,31;255,66,93]./255;
 kkk = 1;
 for k = [1,round(select_num/5),select_num]
 [N,edges] = histcounts(G_noise_norm{k},651,'normalization','pdf');
-plot(edges(2:end),N,'color',map(kkk,:),'o')
-plot(linspace(-0.05,0.05,5000),pdf(F_gradient_noise_norm,linspace(-0.05,0.05,5000))*factor,'color',map(kkk,:));
+plot(edges(2:end),N,'color',map(kkk,:),'marker','o')
+plot(linspace(-0.05,0.05,5000),pdf(F_gradient_noise_norm{k},linspace(-0.05,0.05,5000)),'color',map(kkk,:));
 kkk = kkk + 1;
 end
 legend({'t_w=1 step','t_w=5001','t_w=24000'})
@@ -165,4 +167,5 @@ set(gca,'linewidth',linewidth,'fontsize',fontsize,'tickdir','out','TickLength',[
 set(gcf, 'PaperPositionMode', 'auto');
 
 % output
-saveas(gcf,'test_noavearge_MSD_gradient.fig')
+saveas(gcf,sprintf('test_noavearge_MSD_gradient_%d.fig',ii))
+end
