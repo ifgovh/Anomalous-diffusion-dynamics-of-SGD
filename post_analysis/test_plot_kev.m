@@ -1,8 +1,8 @@
 clear
 close all
 %% load data
-d = dir('/project/RDS-FSC-THAP-RW/Anomalous-diffusion-dynamics-of-SGD/trained_nets/resnet*');
-for ii = 11:length(d)
+d = dir('/project/RDS-FSC-THAP-RW/Anomalous-diffusion-dynamics-of-SGD/trained_nets/resnet14*');
+for ii = 3:3
     clearvars -except d ii
     close all
 
@@ -167,5 +167,5 @@ set(gca,'linewidth',linewidth,'fontsize',fontsize,'tickdir','out','TickLength',[
 set(gcf, 'PaperPositionMode', 'auto');
 
 % output
-saveas(gcf,sprintf('test_noavearge_MSD_gradient_%d.fig',ii))
+saveas(gcf,sprintf('trial_%d.fig',ii))
 end

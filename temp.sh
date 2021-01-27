@@ -13,7 +13,7 @@ param_array=( $params )
 
 # training DNN
 for i in {1..10}
-do
+do      
 	python -m main --model=${param_array[i*5]} --lr=${param_array[i*5+1]} --epochs=${param_array[i*5+2]}  --batch_size=${param_array[i*5+3]} --dataset=${param_array[i*5+4]}
 done
 

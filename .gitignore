@@ -117,3 +117,7 @@ celeba*/
 # matlab
 *~
 *asv
+
+# figure
+*svg
+*fig

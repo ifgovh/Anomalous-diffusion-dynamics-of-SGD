@@ -3,14 +3,14 @@
 #PBS -N SArrayJobs
 #PBS -q defaultQ
 #PBS -l nodes=1:ppn=24
-#PBS -l walltime=23:50:59
+#PBS -l walltime=53:50:59
 #PBS -l mem=123GB
 #PBS -e PBSout/
 #PBS -o PBSout/
 ##PBS -V
-##PBS -J 1-7
+##PBS -J 5-6
 
-PBS_ARRAY_INDEX=3
+PBS_ARRAY_INDEX=7
 MATLAB_SOURCE_PATH1="/project/THAP/Anomalous-diffusion-dynamics-of-SGD/post_analysis"
 MATLAB_PROCESS_FUNC="SGD_analysis_step_level"
 DATA_DIR="trained_nets"
