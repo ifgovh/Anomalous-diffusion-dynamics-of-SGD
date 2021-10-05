@@ -9,19 +9,29 @@ for part = [1,round(select_num/5),select_num]%1:length(datax_dir)-1
     try
         L = load(fullfile(datax_dir(1).folder,[d(ii).name(1:end-24),'_data_part_',num2str(part),'.mat']),...
             'F_grads','F_full_batch_grad','F_gradient_noise_norm','Grads','Full_grads','G_noise_norm');
-        F_grads{part} = L.F_grads;
         F_full_batch_grad{part} = L.F_full_batch_grad;
         F_gradient_noise_norm{part} = L.F_gradient_noise_norm;
         Grads{part} = L.Grads;
         Full_grads{part} = L.Full_grads;
         G_noise_norm{part} = L.G_noise_norm;
     catch
-        F_grads{part} = nan;
         F_full_batch_grad{part} = nan;
         F_gradient_noise_norm{part} = nan;
         Grads{part} = nan;
         Full_grads{part} = nan;
         G_noise_norm{part} = nan;
+    end
+end
+
+for part = 1:select_num%1:length(datax_dir)-1
+    try
+        L = load(fullfile(datax_dir(1).folder,[d(ii).name(1:end-24),'_data_part_',num2str(part),'.mat']),...
+            'F_grads');
+        F_grads{part} = L.F_grads;
+        
+    catch
+        F_grads{part} = nan;
+        
     end
 end
 %% plot superdiffusion
@@ -34,10 +44,10 @@ linewidth = 0.7;
 ylable_shift = -0.2;
 xlable_shift = -0.15;
 TickLength = 0.03;
-EMH = 0.1;
-EMV = 0.4;
+EMH = 0.2;
+EMV = 0.3;
 MLR = 0.65;
-MBR = 0.8;
+MBR = 0.5;
 
 [ figure_hight, SV, SH, MT,MB,ML,MR ] = get_details_for_subaxis(total_row, total_column, figure_width, EMH, 0.5, EMV, 0.6,MLR,MBR);
 figure('NumberTitle','off','name', 'Reproduction', 'units', 'centimeters', ...
@@ -45,8 +55,8 @@ figure('NumberTitle','off','name', 'Reproduction', 'units', 'centimeters', ...
     'PaperSize', [figure_width, figure_hight]); % this is the trick!
 
 % gradient
-G_dir = dir(fullfile(d(ii).folder,'all_gradients.mat'));
-load(fullfile(G_dir.folder,G_dir.name))
+% G_dir = dir(fullfile(d(ii).folder,'all_gradients.mat'));
+% load(fullfile(G_dir.folder,G_dir.name))
 subaxis(total_row,total_column,1,1,'SpacingHoriz',SH,...
     'SpacingVert',SV,'MR',MR,'ML',ML,'MT',MT,'MB',MB);
 hold on
@@ -76,11 +86,64 @@ plot(linspace(0,0.2,1000),pdf(F,linspace(0,0.2,1000)),'m-');
 set(get(gca,'Ylabel'),'rotation',-45)
 set(gca,'xscale','log','yscale','linear','tickdir','out','TickLength',[TickLength 0.035])
 
+% gradient at initial stage
+subaxis(total_row,total_column,2,1,'SpacingHoriz',SH,...
+    'SpacingVert',SV,'MR',MR,'ML',ML,'MT',MT,'MB',MB);
+hold on
+
+map = [0,90,171;71,31,31;255,66,93]./255;
+
+for k = 1
+    [N,edges] = histcounts(Grads{k},'normalization','pdf');
+    plot(edges(2:10:end),N(1:10:end),'color','k','marker','o','linestyle','none');
+    plot(linspace(-0.2,0.2,5000),pdf(F_grads{k},linspace(-0.2,0.2,5000)),'color','r');
+end
+xlim([-0.05,0.05])
+text(0.6,0.7,['\alpha=',num2str(F_grads{k}.alpha,3)],'fontsize',fontsize,'Units', 'Normalized', 'VerticalAlignment', 'Top')
+% y = ylabel('PDF');
+x = xlabel('Gradient, t\in[1,1000]');
+% set(y, 'Units', 'Normalized', 'Position', [ylable_shift, 0.5, 0]);
+set(x, 'Units', 'Normalized', 'Position', [0.5, xlable_shift, 0]);
+text(-0.18,1.15,'(b)','fontsize',fontsize,'Units', 'Normalized', 'FontWeight','bold','VerticalAlignment', 'Top')
+set(gca,'linewidth',linewidth,'fontsize',fontsize,'tickdir','out','TickLength',[TickLength 0.035],'yscale','linear')
+
+% gradient at finial stage
+subaxis(total_row,total_column,3,1,'SpacingHoriz',SH,...
+    'SpacingVert',SV,'MR',MR,'ML',ML,'MT',MT,'MB',MB);
+hold on
+
+for k = select_num
+    [N,edges] = histcounts(Grads{k},1001,'normalization','pdf');
+    plot(edges(2:10:end),N(1:10:end),'color','k','marker','o','linestyle','none');
+    plot(linspace(-0.2,0.2,5000),pdf(F_grads{k},linspace(-0.2,0.2,5000)),'color','r');
+end
+xlim([-0.05,0.05])
+text(0.6,0.7,['\alpha=',num2str(F_grads{k}.alpha,3)],'fontsize',fontsize,'Units', 'Normalized', 'VerticalAlignment', 'Top')
+% y = ylabel('PDF');
+x = xlabel('Gradient, t\in[23001,24000]');
+% set(y, 'Units', 'Normalized', 'Position', [ylable_shift, 0.5, 0]);
+set(x, 'Units', 'Normalized', 'Position', [0.5, xlable_shift, 0]);
+text(-0.18,1.15,'(c)','fontsize',fontsize,'Units', 'Normalized', 'FontWeight','bold','VerticalAlignment', 'Top')
+set(gca,'linewidth',linewidth,'fontsize',fontsize,'tickdir','out','TickLength',[TickLength 0.035],'yscale','linear')
+
+% gradient distribution alpha
+subaxis(total_row,total_column,1,2,'SpacingHoriz',SH,...
+    'SpacingVert',SV,'MR',MR,'ML',ML,'MT',MT,'MB',MB);
+hold on
+for k = 1:length(F_grads)
+plot(k,F_grads{k}.alpha,'k-o')
+end
+y = ylabel('\alpha');
+x = xlabel('t_w');
+set(y, 'Units', 'Normalized', 'Position', [ylable_shift, 0.5, 0]);
+set(x, 'Units', 'Normalized', 'Position', [0.5, xlable_shift, 0]);
+text(-0.18,1.15,'(d)','fontsize',fontsize,'Units', 'Normalized', 'FontWeight','bold','VerticalAlignment', 'Top')
+set(gca,'linewidth',linewidth,'fontsize',fontsize,'tickdir','out','TickLength',[TickLength 0.035],'yscale','linear')
 
 % \Delta L vs t
 load(fullfile(d(1).folder,'trans_ex_avalan.mat'))
 delta_loss_temp = abs(diff(loss_all{2}));
-subaxis(total_row,total_column,2,1,'SpacingHoriz',SH,...
+subaxis(total_row,total_column,2,2,'SpacingHoriz',SH,...
     'SpacingVert',SV,'MR',MR,'ML',ML,'MT',MT,'MB',MB);
 hold on
 kkk = 1;
@@ -93,12 +156,12 @@ x = xlabel('Relative time (step)');
 y = ylabel('|{\Delta}L|');
 set(y, 'Units', 'Normalized', 'Position', [ylable_shift, 0.5, 0]);
 set(x, 'Units', 'Normalized', 'Position', [0.5, xlable_shift, 0]);
-text(-0.18,1.15,'(b)','fontsize',fontsize,'Units', 'Normalized', 'FontWeight','bold','VerticalAlignment', 'Top')
+text(-0.18,1.15,'(e)','fontsize',fontsize,'Units', 'Normalized', 'FontWeight','bold','VerticalAlignment', 'Top')
 set(gca,'linewidth',linewidth,'fontsize',fontsize,'tickdir','out','TickLength',[TickLength 0.035])
 
 
 % movvar vs t
-subaxis(total_row,total_column,3,1,'SpacingHoriz',SH,...
+subaxis(total_row,total_column,3,2,'SpacingHoriz',SH,...
     'SpacingVert',SV,'MR',MR,'ML',ML,'MT',MT,'MB',MB);
 var_win = 100;
 instant_var = movvar(loss_all{2},[0,var_win]);
@@ -109,75 +172,76 @@ x = xlabel('Time (step)');
 y = ylabel('Moving variance');
 set(y, 'Units', 'Normalized', 'Position', [ylable_shift, 0.5, 0]);
 set(x, 'Units', 'Normalized', 'Position', [0.5, xlable_shift, 0]);
-text(-0.18,1.15,'(c)','fontsize',fontsize,'Units', 'Normalized', 'FontWeight','bold','VerticalAlignment', 'Top')
-set(gca,'linewidth',linewidth,'fontsize',fontsize,'tickdir','out','TickLength',[TickLength 0.035])
-
-% gradient
-subaxis(total_row,total_column,1,2,'SpacingHoriz',SH,...
-    'SpacingVert',SV,'MR',MR,'ML',ML,'MT',MT,'MB',MB);
-hold on
-
-map = [0,90,171;71,31,31;255,66,93]./255;
-kkk = 1;
-for k = [1,round(select_num/5),select_num]
-    [N,edges] = histcounts(Grads{k},'normalization','pdf');
-    data_points{kkk} = plot(edges(2:10:end),N(1:10:end),'color',map(kkk,:),'marker','o','linestyle','none');
-    plot(linspace(-0.2,0.2,5000),pdf(F_grads{k},linspace(-0.2,0.2,5000)),'color',map(kkk,:));
-    kkk = kkk + 1;
-end
-xlim([-0.05,0.05])
-legend([data_points{1},data_points{2},data_points{3}], {'t_w=1 step','t_w=5001','t_w=24000'})
-legend boxoff
-y = ylabel('PDF');
-x = xlabel('Minibatch Gradient');
-set(y, 'Units', 'Normalized', 'Position', [ylable_shift, 0.5, 0]);
-set(x, 'Units', 'Normalized', 'Position', [0.5, xlable_shift, 0]);
-text(-0.18,1.15,'(d)','fontsize',fontsize,'Units', 'Normalized', 'FontWeight','bold','VerticalAlignment', 'Top')
-set(gca,'linewidth',linewidth,'fontsize',fontsize,'tickdir','out','TickLength',[TickLength 0.035],'yscale','linear')
-
-subaxis(total_row,total_column,2,2,'SpacingHoriz',SH,...
-    'SpacingVert',SV,'MR',MR,'ML',ML,'MT',MT,'MB',MB);
-hold on
-
-map = [0,90,171;71,31,31;255,66,93]./255;
-kkk = 1;
-for k = [1,round(select_num/5),select_num]
-    [N,edges] = histcounts(Full_grads{k},'normalization','pdf');
-    data_points{kkk} = plot(edges(2:10:end),N(1:10:end),'color',map(kkk,:),'marker','o','linestyle','none');
-    plot(linspace(-0.05,0.05,5000),pdf(F_full_batch_grad{k},linspace(-0.05,0.05,5000)),'color',map(kkk,:));
-    kkk = kkk + 1;
-end
-legend([data_points{1},data_points{2},data_points{3}],{'t_w=1 step','t_w=5001','t_w=24000'})
-legend boxoff
-y = ylabel('PDF');
-x = xlabel('Estimated full-batch Gradient');
-set(y, 'Units', 'Normalized', 'Position', [ylable_shift, 0.5, 0]);
-set(x, 'Units', 'Normalized', 'Position', [0.5, xlable_shift, 0]);
-text(-0.18,1.15,'(e)','fontsize',fontsize,'Units', 'Normalized', 'FontWeight','bold','VerticalAlignment', 'Top')
-set(gca,'linewidth',linewidth,'fontsize',fontsize,'tickdir','out','TickLength',[TickLength 0.035],'yscale','linear')
-
-subaxis(total_row,total_column,3,2,'SpacingHoriz',SH,...
-    'SpacingVert',SV,'MR',MR,'ML',ML,'MT',MT,'MB',MB);
-hold on
-
-map = [0,90,171;71,31,31;255,66,93]./255;
-kkk = 1;
-for k = [1,round(select_num/5),select_num]
-    [N,edges] = histcounts(G_noise_norm{k},'normalization','pdf');
-    data_points{kkk} = plot(edges(2:10:end),N(1:10:end),'color',map(kkk,:),'marker','o','linestyle','none');
-    plot(linspace(-0.05,0.05,5000),pdf(F_gradient_noise_norm{k},linspace(-0.05,0.05,5000)),'color',map(kkk,:));
-    kkk = kkk + 1;
-end
-legend([data_points{1},data_points{2},data_points{3}],{'t_w=1 step','t_w=5001','t_w=24000'})
-legend boxoff
-y = ylabel('PDF');
-x = xlabel('Minibatch Gradient');
-set(y, 'Units', 'Normalized', 'Position', [ylable_shift, 0.5, 0]);
-set(x, 'Units', 'Normalized', 'Position', [0.5, xlable_shift, 0]);
 text(-0.18,1.15,'(f)','fontsize',fontsize,'Units', 'Normalized', 'FontWeight','bold','VerticalAlignment', 'Top')
 set(gca,'linewidth',linewidth,'fontsize',fontsize,'tickdir','out','TickLength',[TickLength 0.035])
+
+
+% gradient; put together
+% subaxis(total_row,total_column,1,2,'SpacingHoriz',SH,...
+%     'SpacingVert',SV,'MR',MR,'ML',ML,'MT',MT,'MB',MB);
+% hold on
+% 
+% map = [0,90,171;71,31,31;255,66,93]./255;
+% kkk = 1;
+% for k = [1,round(select_num/5),select_num]
+%     [N,edges] = histcounts(Grads{k},'normalization','pdf');
+%     data_points{kkk} = plot(edges(2:10:end),N(1:10:end),'color',map(kkk,:),'marker','o','linestyle','none');
+%     plot(linspace(-0.2,0.2,5000),pdf(F_grads{k},linspace(-0.2,0.2,5000)),'color',map(kkk,:));
+%     kkk = kkk + 1;
+% end
+% xlim([-0.05,0.05])
+% legend([data_points{1},data_points{2},data_points{3}], {'t_w=1 step','t_w=5001','t_w=24000'})
+% legend boxoff
+% y = ylabel('PDF');
+% x = xlabel('Minibatch Gradient');
+% set(y, 'Units', 'Normalized', 'Position', [ylable_shift, 0.5, 0]);
+% set(x, 'Units', 'Normalized', 'Position', [0.5, xlable_shift, 0]);
+% text(-0.18,1.15,'(d)','fontsize',fontsize,'Units', 'Normalized', 'FontWeight','bold','VerticalAlignment', 'Top')
+% set(gca,'linewidth',linewidth,'fontsize',fontsize,'tickdir','out','TickLength',[TickLength 0.035],'yscale','linear')
+
+% subaxis(total_row,total_column,2,2,'SpacingHoriz',SH,...
+%     'SpacingVert',SV,'MR',MR,'ML',ML,'MT',MT,'MB',MB);
+% hold on
+% 
+% map = [0,90,171;71,31,31;255,66,93]./255;
+% kkk = 1;
+% for k = [1,round(select_num/5),select_num]
+%     [N,edges] = histcounts(Full_grads{k},'normalization','pdf');
+%     data_points{kkk} = plot(edges(2:10:end),N(1:10:end),'color',map(kkk,:),'marker','o','linestyle','none');
+%     plot(linspace(-0.05,0.05,5000),pdf(F_full_batch_grad{k},linspace(-0.05,0.05,5000)),'color',map(kkk,:));
+%     kkk = kkk + 1;
+% end
+% legend([data_points{1},data_points{2},data_points{3}],{'t_w=1 step','t_w=5001','t_w=24000'})
+% legend boxoff
+% y = ylabel('PDF');
+% x = xlabel('Estimated full-batch Gradient');
+% set(y, 'Units', 'Normalized', 'Position', [ylable_shift, 0.5, 0]);
+% set(x, 'Units', 'Normalized', 'Position', [0.5, xlable_shift, 0]);
+% text(-0.18,1.15,'(e)','fontsize',fontsize,'Units', 'Normalized', 'FontWeight','bold','VerticalAlignment', 'Top')
+% set(gca,'linewidth',linewidth,'fontsize',fontsize,'tickdir','out','TickLength',[TickLength 0.035],'yscale','linear')
+% 
+% subaxis(total_row,total_column,3,2,'SpacingHoriz',SH,...
+%     'SpacingVert',SV,'MR',MR,'ML',ML,'MT',MT,'MB',MB);
+% hold on
+% 
+% map = [0,90,171;71,31,31;255,66,93]./255;
+% kkk = 1;
+% for k = [1,round(select_num/5),select_num]
+%     [N,edges] = histcounts(G_noise_norm{k},'normalization','pdf');
+%     data_points{kkk} = plot(edges(2:10:end),N(1:10:end),'color',map(kkk,:),'marker','o','linestyle','none');
+%     plot(linspace(-0.05,0.05,5000),pdf(F_gradient_noise_norm{k},linspace(-0.05,0.05,5000)),'color',map(kkk,:));
+%     kkk = kkk + 1;
+% end
+% legend([data_points{1},data_points{2},data_points{3}],{'t_w=1 step','t_w=5001','t_w=24000'})
+% legend boxoff
+% y = ylabel('PDF');
+% x = xlabel('Minibatch Gradient');
+% set(y, 'Units', 'Normalized', 'Position', [ylable_shift, 0.5, 0]);
+% set(x, 'Units', 'Normalized', 'Position', [0.5, xlable_shift, 0]);
+% text(-0.18,1.15,'(f)','fontsize',fontsize,'Units', 'Normalized', 'FontWeight','bold','VerticalAlignment', 'Top')
+% set(gca,'linewidth',linewidth,'fontsize',fontsize,'tickdir','out','TickLength',[TickLength 0.035])
 
 set(gcf, 'PaperPositionMode', 'auto');
 
 % output
-% print('-painters' ,'fig5.svg','-dsvg','-r300')
+print('-painters' ,'fig5.svg','-dsvg','-r300')

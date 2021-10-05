@@ -1,7 +1,7 @@
 clear
 close all
 %% load data
-d = dir('/project/RDS-FSC-cortical-RW/Anomalous-diffusion-dynamics-of-SGD/trained_nets/resnet*');
+d = dir('/project/RDS-FSC-cortical-RW/Anomalous-diffusion-dynamics-of-SGD/trained_nets/resnet14_epoch5000_*');
 ii = 1;
 
 datax_dir = dir(fullfile(d(ii).folder,d(ii).name,'*data_part*'));
@@ -56,7 +56,7 @@ for k = [1,round(select_num/5),select_num]
     loglog(tau{k},MSD{k},'color',map(k,:),'linewidth',linewidth)
 end
 axis([1,1e3,1e-2,1e2])
-legend({'t_w=1 step','t_w=5001','t_w=24000'})
+legend({'t_w=1 step','t_w=5001','t_w=23001'})
 legend boxoff
 xlabel('\tau (step)')
 y = ylabel('{\Delta}r^2(\tau)');
@@ -103,7 +103,7 @@ xlabel('\tau (step)')
 y = ylabel('{\Delta}r^2(\tau)');
 set(y, 'Units', 'Normalized', 'Position', [ylable_shift, 0.5, 0]);
 text(-0.18,1.13,'(d)','fontsize',fontsize,'Units', 'Normalized', 'FontWeight','bold','VerticalAlignment', 'Top')
-set(gca,'linewidth',linewidth,'fontsize',fontsize,'tickdir','out','xscale','log','yscale','log','xtick',[1,10,100,1000,1e4])
+set(gca,'linewidth',linewidth,'fontsize',fontsize,'tickdir','out','xscale','log','yscale','log','xtick',[1,10,100,1000,1e4],'TickLength',[TickLength 0.035])
 % legend({'t_w=1 step','t_w=10001 steps','t_w=20001 steps','t_w=30001 steps','t_w=40001 steps'})
 % legend boxoff
 % colorbar
@@ -128,7 +128,7 @@ axis([1,1e3,0.5,2.5])
 xlabel('\tau (step)')
 ylabel('\beta(\tau)')
 text(-0.18,1.1,'(c)','fontsize',fontsize,'Units', 'Normalized', 'FontWeight','bold','VerticalAlignment', 'Top')
-set(gca,'linewidth',linewidth,'fontsize',fontsize,'tickdir','out','xscale','log','yscale','linear','xtick',[1,10,100,1000])
+set(gca,'linewidth',linewidth,'fontsize',fontsize,'tickdir','out','xscale','log','yscale','linear','xtick',[1,10,100,1000],'TickLength',[TickLength 0.035])
 % one dynamical exponent
 insect = axes('position',[0.074 0.316552388432713 0.09 0.129036460946836]);
 axis(insect);box on;
@@ -156,7 +156,7 @@ for k = [1,round(select_num/10),select_num]
     kkk=kkk+1;
 end
 % axis([1,1e3,1e-2,1e2])
-legend({'t_w=1 step','t_w=24000','t_w=240000'})
+legend({'t_w=1 step','t_w=23001','t_w=230001'})
 legend boxoff
 xlabel('\tau (step)')
 y = ylabel('{\Delta}r^2(\tau)');
@@ -176,7 +176,7 @@ for k = [1,round(select_num/5),select_num]
     kkk=kkk+1;
 end
 % axis([1,1e3,1e-2,1e2])
-legend({'t_w=1 step','t_w=5001','t_w=24000'})
+legend({'t_w=1 step','t_w=5001','t_w=23001'})
 legend boxoff
 xlabel('\tau (step)')
 y = ylabel('No time-average {\Delta}r^2(\tau)');
@@ -187,4 +187,4 @@ set(gca,'linewidth',linewidth,'fontsize',fontsize,'tickdir','out','xscale','log'
 set(gcf, 'PaperPositionMode', 'auto');
 
 % output
-print('-painters' ,'fig2.svg','-dsvg','-r300')
+%print('-painters' ,'fig2.svg','-dsvg','-r300')
