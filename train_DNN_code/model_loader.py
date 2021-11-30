@@ -4,6 +4,7 @@ import train_DNN_code.models.vgg as vgg
 import train_DNN_code.models.resnet as resnet
 import train_DNN_code.models.densenet as densenet
 import train_DNN_code.models.Alexnet as Alexnet
+import train_DNN_code.models.vit as ViT
 
 # map between model name and function
 models = {
@@ -53,6 +54,7 @@ models = {
     'resnet_mnist'        : resnet.ResNet_mnist,
     'resnet14_nobatchnorm'  : resnet.ResNet14_nobatchnorm,
     'resnet14_noshort_nobatchnorm':resnet.ResNet14_noshort_nobatchnorm,
+    'vit'                   : vit.vit_cifar10,
     
 }
 

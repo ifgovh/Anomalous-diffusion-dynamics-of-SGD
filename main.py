@@ -103,7 +103,6 @@ def train_save(trainloader, net, criterion, optimizer, use_cuda=True):
 
             # record tiny steps in every epoch
             sub_loss.append(loss.item())
-            import pdb; pdb.set_trace()
             w = net_plotter.get_weights(net) # initial parameters
             for j in range(len(w)):
                 w[j] = w[j].cpu().numpy()
