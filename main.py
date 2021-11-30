@@ -526,12 +526,22 @@ if __name__ == '__main__':
             loss, train_err, sub_weights, sub_loss, grads, estimated_full_batch_grad, gradient_noise_norm = train_save(trainloader, net, criterion, optimizer, use_cuda)
             test_loss, test_err, test_sub_loss = test_save(testloader, net, criterion, use_cuda)
 
-            # save loss and weights in each tiny step in every epoch
-            sio.savemat('trained_nets/' + save_folder + '/model_' + str(epoch) + '_sub_loss_w.mat',
-                                mdict={'sub_weights': sub_weights,'sub_loss': sub_loss, 'test_sub_loss': test_sub_loss,
-                                'grads': grads.numpy(), 'estimated_full_batch_grad': estimated_full_batch_grad.numpy(),
-                                'gradient_noise_norm': gradient_noise_norm.numpy()},
-                                )            
+            try:
+                # save loss and weights in each tiny step in every epoch
+                sio.savemat('trained_nets/' + save_folder + '/model_' + str(epoch) + '_sub_loss_w.mat',
+                                    mdict={'sub_weights': sub_weights,'sub_loss': sub_loss, 'test_sub_loss': test_sub_loss,
+                                    'grads': grads.numpy(), 'estimated_full_batch_grad': estimated_full_batch_grad.numpy(),
+                                    'gradient_noise_norm': gradient_noise_norm.numpy()},
+                                    )
+            except:
+                f = h5py.File('trained_nets/' + save_folder + '/model_' + str(epoch) + '_sub_loss_w.mat', 'a')  
+                save_data={'sub_weights': sub_weights,'sub_loss': sub_loss, 'test_sub_loss': test_sub_loss,
+                                    'grads': grads.numpy(), 'estimated_full_batch_grad': estimated_full_batch_grad.numpy(),
+                                    'gradient_noise_norm': gradient_noise_norm.numpy()}          
+                for key, value in save_data.items():
+                    f.create_dataset(key, data=value)
+                f.close()
+
         else:
             loss, train_err, grads, estimated_full_batch_grad, gradient_noise_norm = train(trainloader, net, criterion, optimizer, use_cuda)
             test_loss, test_err = test(testloader, net, criterion, use_cuda)
