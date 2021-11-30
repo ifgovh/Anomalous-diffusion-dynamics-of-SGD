@@ -4,7 +4,7 @@ import train_DNN_code.models.vgg as vgg
 import train_DNN_code.models.resnet as resnet
 import train_DNN_code.models.densenet as densenet
 import train_DNN_code.models.Alexnet as Alexnet
-import train_DNN_code.models.vit as ViT
+import train_DNN_code.models.vit as vit
 
 # map between model name and function
 models = {
@@ -55,7 +55,7 @@ models = {
     'resnet14_nobatchnorm'  : resnet.ResNet14_nobatchnorm,
     'resnet14_noshort_nobatchnorm':resnet.ResNet14_noshort_nobatchnorm,
     'vit'                   : vit.vit_cifar10,
-    
+
 }
 
 def load(model_name, model_file=None, data_parallel=False):
