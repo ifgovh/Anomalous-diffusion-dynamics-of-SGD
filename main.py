@@ -6,6 +6,7 @@ import numpy as np
 import argparse
 import scipy.io as sio
 import math
+import h5py
 
 import torch.nn as nn
 import torch.nn.init as init
@@ -110,13 +111,13 @@ def train_save(trainloader, net, criterion, optimizer, use_cuda=True):
 
             train_loss += loss.item()*batch_size
             _, predicted = torch.max(outputs.data, 1)
-            correct += predicted.cpu().eq(targets).cpu().sum().item()  
+            correct += predicted.cpu().eq(targets).cpu().sum().item()
 
     M = len(grads[0]) # total number of parameters
     grads = torch.cat(grads).view(-1, M)
     mean_grad = grads.sum(0) / (batch_idx + 1) # divided by # batchs
     noise_norm = (grads - mean_grad).norm(dim=1)
-  
+
     return train_loss/total, 100 - 100.*correct/total, sub_weights, sub_loss, grads, mean_grad, noise_norm
 
 
@@ -170,7 +171,7 @@ def train(trainloader, net, criterion, optimizer, use_cuda=True):
     correct = 0
     total = 0
 
-    grads = []    
+    grads = []
 
     if isinstance(criterion, nn.CrossEntropyLoss):
         for batch_idx, (inputs, targets) in enumerate(trainloader):
@@ -211,7 +212,7 @@ def train(trainloader, net, criterion, optimizer, use_cuda=True):
             grad = get_grads(net).cpu()
             grads.append(grad)
 
-            optimizer.step()            
+            optimizer.step()
 
             train_loss += loss.item()*batch_size
             _, predicted = torch.max(outputs.data, 1)
@@ -221,7 +222,7 @@ def train(trainloader, net, criterion, optimizer, use_cuda=True):
     grads = torch.cat(grads).view(-1, M)
     mean_grad = grads.sum(0) / (batch_idx + 1) # divided by # batchs
     noise_norm = (grads - mean_grad).norm(dim=1)
-  
+
     return train_loss/total, 100 - 100.*correct/total, grads, mean_grad, noise_norm
 
 
@@ -273,31 +274,31 @@ def hypothesis_test_noise(noise):
 
 
     index      = []
-    index_counter = 0 
+    index_counter = 0
     #min_num = 1000.0
     #max_num = 0.0
 
     for elems in noise:
         if len(elems) > 0 and index_counter % 1 == 0:
             #result_arr.append(elems.numpy())
-            fit =  powerlaw.Fit(elems.numpy())        
+            fit =  powerlaw.Fit(elems.numpy())
             R, p =  fit.distribution_compare('power_law', 'exponential')
             #print (len(elems.numpy()), fit.alpha, fit.x_min, fit.sigma, R, p)
             #if np.amin(elems.numpy()) < min_num:
             #    min_num = np.amin(elems.numpy())
             #if np.amax(elems.numpy()) > max_num:
-            #    max_num = np.amax(elems.numpy())  
+            #    max_num = np.amax(elems.numpy())
             result_arr_R.append(R)
             result_arr_p.append(p)
             result_arr_diff.append(np.absolute(fit.xmin - np.mean(elems.numpy())))
             result_arr_alpha.append(fit.alpha)
-            result_arr_sigma.append(fit.sigma)  
+            result_arr_sigma.append(fit.sigma)
 
 
             index.append(1000 * index_counter)
-        index_counter += 1  
+        index_counter += 1
     #    if index_counter > 50000:
-    #       break  
+    #       break
 
     plt.figure()
 
@@ -319,7 +320,7 @@ def hypothesis_test_noise(noise):
     y4 = result_arr_alpha
 
     sio.savemat('trained_nets/' + save_folder + '/' + args.model + '_hypothesis_test.mat',
-                        mdict={'index': index,'result_arr_R': result_arr_R,'result_arr_p':result_arr_p, 
+                        mdict={'index': index,'result_arr_R': result_arr_R,'result_arr_p':result_arr_p,
                         'result_arr_diff':result_arr_diff,
                         'result_arr_alpha':result_arr_alpha},
                         )
@@ -373,7 +374,7 @@ def name_save_folder(args):
     save_folder = args.model + '_epoch' + str(args.epochs) + '_lr=' + str(args.lr)
 
     save_folder += '_bs=' + str(args.batch_size) + '_data_' + str(args.dataset)
-    
+
     if args.loss_name != 'crossentropy':
         save_folder += '_loss=' + str(args.loss_name)
     if args.noaug:
@@ -420,7 +421,7 @@ if __name__ == '__main__':
     parser.add_argument('--idx', default=0, type=int, help='the index for the repeated experiment')
 
     #parameters for gaussian data
-    parser.add_argument('--gauss_scale', default=10.0, type=float) 
+    parser.add_argument('--gauss_scale', default=10.0, type=float)
 
     args = parser.parse_args()
 
@@ -455,7 +456,7 @@ if __name__ == '__main__':
         trainloader, testloader = get_synthetic_gaussian_data_loaders(args)
     else:
         trainloader, testloader, _ = get_data_loaders(args)
-        
+
 
     if args.label_corrupt_prob and not args.resume_model:
         torch.save(trainloader, 'trained_nets/' + save_folder + '/trainloader.dat')
@@ -517,9 +518,9 @@ if __name__ == '__main__':
     # training logs per iteration
     training_history = []
     testing_history = []
-   
+
     for epoch in range(start_epoch, args.epochs + 1):
-        print(epoch)        
+        print(epoch)
         # Save checkpoint.
         if epoch == 1 or epoch % args.save_epoch == 0:
 
@@ -534,13 +535,13 @@ if __name__ == '__main__':
                                     'gradient_noise_norm': gradient_noise_norm.numpy()},
                                     )
             except:
-                f = h5py.File('trained_nets/' + save_folder + '/model_' + str(epoch) + '_sub_loss_w.mat', 'a')  
+                ff = h5py.File('trained_nets/' + save_folder + '/model_' + str(epoch) + '_sub_loss_w.mat', 'a')
                 save_data={'sub_weights': sub_weights,'sub_loss': sub_loss, 'test_sub_loss': test_sub_loss,
                                     'grads': grads.numpy(), 'estimated_full_batch_grad': estimated_full_batch_grad.numpy(),
-                                    'gradient_noise_norm': gradient_noise_norm.numpy()}          
+                                    'gradient_noise_norm': gradient_noise_norm.numpy()}
                 for key, value in save_data.items():
-                    f.create_dataset(key, data=value)
-                f.close()
+                    ff.create_dataset(key, data=value)
+                ff.close()
 
         else:
             loss, train_err, grads, estimated_full_batch_grad, gradient_noise_norm = train(trainloader, net, criterion, optimizer, use_cuda)
@@ -570,9 +571,9 @@ if __name__ == '__main__':
         # torch.save(state, 'trained_nets/' + save_folder + '/model_' + str(epoch) + '.t7')
         # torch.save(opt_state, 'trained_nets/' + save_folder + '/opt_state_' + str(epoch) + '.t7')
 
-   
+
     f.close()
- 
+
     sio.savemat('trained_nets/' + save_folder + '/' + args.model + '_loss_log.mat',
                         mdict={'training_history': training_history,'testing_history': testing_history},
                         )
